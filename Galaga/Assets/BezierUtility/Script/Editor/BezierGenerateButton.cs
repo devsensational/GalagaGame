@@ -12,7 +12,11 @@ public class BezierGenerateButton : Editor
         base.OnInspectorGUI();
         
         BezierUtil bezierGenerateButton = (BezierUtil)target;
-        if(GUILayout.Button("Save Bezier File"))
+        if (GUILayout.Button("Create new point"))
+        {
+            bezierGenerateButton.CreateNewPointObject();
+        }
+        if (GUILayout.Button("Save Bezier File"))
         {
             bezierGenerateButton.SaveBezierFile();
         }
