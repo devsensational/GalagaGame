@@ -11,7 +11,7 @@ public class BezierObject
 
     public BezierObject()
     {
-        StartPosition = new float[3] { 1, 1, 1 };
-        EndPosition = new float[3] { 2, 2, 2 };
+        StartPosition = new float[3];
+        EndPosition = new float[3];
     }
 }

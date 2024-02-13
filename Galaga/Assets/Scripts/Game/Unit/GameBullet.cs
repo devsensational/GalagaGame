@@ -1,26 +1,40 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
-public class GameBullet : MonoBehaviour, IGameFlyable, IGameDamageable
+public class GameBullet : MonoBehaviour, IGameBullet
 {
-    public void DisableUnit()
+    //Inspector
+    public float BulletSpeed;
+    public float BulletSpeedMultiplier;
+
+    //protected
+    protected Vector3 direction;
+
+    //private
+    private IObjectPool<GameBullet> gameBulletPool;
+
+    public GameBullet(Vector3 direction) {  this.direction = direction; }
+
+    public void UpdateBullet(Vector3 direction)
     {
-        throw new System.NotImplementedException();
+
     }
 
-    public void EnableUnit()
+    public void ChildUpdate() { }
+
+    public void Update()
     {
-        throw new System.NotImplementedException();
+        UpdateBullet(direction);
+        ChildUpdate();
     }
 
-    public void FlyUnit()
+    public void DestoryBullet()
     {
-        throw new System.NotImplementedException();
-    }
-
-    public bool UnitDamaged()
-    {
-        throw new System.NotImplementedException();
+        if (gameBulletPool != null) 
+        {
+            gameBulletPool.Release(this);
+        }
     }
 }

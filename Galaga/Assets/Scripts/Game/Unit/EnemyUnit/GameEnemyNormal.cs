@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IGameAttackable
+public class GameEnemyNormal : GameEnemyUnit
 {
-    abstract bool UnitAttack();
+
 }

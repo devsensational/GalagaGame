@@ -2,24 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameUnit : MonoBehaviour, IGameAttackable
+public enum UnitStatus: uint
 {
-    [SerializeField] protected int Hp = 1;
-    [SerializeField] private float moveSpeed = 1f;
-    [SerializeField] private float moveSpeedMultiplier = 1f;
+    None        = 0x00,
+    Unknown     = 0x01,
 
-    public bool UnitAttack()
-    {
-        throw new System.NotImplementedException();
-    }
+    //아래에 Enum 값 작성
+    Default     = 0x02,
+    Hit         = 0x04,
+    Caputred    = 0x08,
+    Dead        = 0x10,
+    //Enum End
 
-    public bool UnitDamaged()
-    {
-        return true;
-    }
+    End         = 0xFF
+}
+public class GameUnit : MonoBehaviour
+{
+    //Inspector
+    [SerializeField] protected int      Hp                  = 1;
+    [SerializeField] protected float    moveSpeed           = 1f;
+    [SerializeField] protected float    moveSpeedMultiplier = 1f;
 
-    private void UnitDisable()
-    {
-        gameObject.SetActive(false);
-    }
+    //Protected
+    protected uint UnitStatusValue = (uint)UnitStatus.None;
+
+    public void UnitMovement() { }
 }

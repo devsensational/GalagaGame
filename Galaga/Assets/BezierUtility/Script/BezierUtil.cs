@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEditor.PlayerSettings;
 
 public class BezierUtil : MonoBehaviour
 {
@@ -71,10 +72,11 @@ public class BezierUtil : MonoBehaviour
         filePath = Path.Combine(Application.dataPath, "BezierUtility/Output", fileName);
         bezierPointer = new BezierObject();
 
-        controlPoints = new List<Vector3>();
-
-        controlPoints.Add(StartObject.transform.position);
-        controlPoints.Add(EndObject.transform.position);
+        controlPoints = new List<Vector3>
+        {
+            StartObject.transform.position,
+            EndObject.transform.position
+        };
 
         CreateNewPointObject();
 
@@ -83,17 +85,18 @@ public class BezierUtil : MonoBehaviour
 
     public void CreateNewPointObject()
     {
+        Vector3 pos = new Vector3(0f, 0f, 0f);
+        CreateNewPointObject(pos);
+    }
+
+    public void CreateNewPointObject(Vector3 pos)
+    {
         GameObject ptr = Instantiate(PointObject);
+        ptr.name = "P" + pointObjects.Count.ToString();
+        ptr.transform.position = pos;
         pointObjects.Add(ptr);
-        Vector3 pos = ptr.transform.position;
         bezierPointer.PointList.Add(new float[3] { pos.x, pos.y, pos.z });
         controlPoints.Insert(controlPoints.Count - 1, MovementUnit.transform.position);
-    }
-    public void CreateNewPointObject(Transform pos)
-    {
-        GameObject ptr = Instantiate(PointObject, pos);
-        pointObjects.Add(ptr);
-        controlPoints.Insert(controlPoints.Count - 2, MovementUnit.transform.position);
     }
 
     private void ViewBezierObjects()
@@ -140,8 +143,20 @@ public class BezierUtil : MonoBehaviour
         return result;
     }
 
+    private void SyncPositionValue(float[] arr, Vector3 position)
+    {
+        arr[0] = position.x; arr[1] = position.y; arr[2] = position.z;
+    }
+
     public void SaveBezierFile()
     {
+        SyncPositionValue(bezierPointer.StartPosition, StartObject.transform.position);
+        SyncPositionValue(bezierPointer.EndPosition, EndObject.transform.position);
+        for(int i = 0; i < bezierPointer.PointList.Count; i++)
+        {
+            SyncPositionValue(bezierPointer.PointList[i], pointObjects[i].transform.position); 
+        }
+
         // 객체를 JSON 문자열로 변환
         string json = JsonConvert.SerializeObject(bezierPointer, Formatting.Indented);
 
@@ -161,6 +176,13 @@ public class BezierUtil : MonoBehaviour
 
             // JSON 문자열을 객체로 변환
             bezierPointer = JsonConvert.DeserializeObject<BezierObject>(json);
+
+            Vector3 pos = new Vector3();
+            for(int i = 0; i < bezierPointer.PointList.Count; i++)
+            {
+                pos.Set(bezierPointer.PointList[i][0], bezierPointer.PointList[i][1], bezierPointer.PointList[i][2]);
+                CreateNewPointObject(pos);
+            }
             ViewBezierObjects();
             Debug.Log("Loaded Bezier file from " + filePath);
         }
@@ -169,5 +191,4 @@ public class BezierUtil : MonoBehaviour
             Debug.LogError("Cannot load Bezier file; file does not exist.");
         }
     }
-
 }

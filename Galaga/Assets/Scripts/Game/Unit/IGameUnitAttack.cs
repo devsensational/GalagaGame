@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IGameDamageable
+public interface IGameUnitAttack
 {
-    abstract bool UnitDamaged();
+    abstract void UnitAttack();
 }
