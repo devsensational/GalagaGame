@@ -4,7 +4,8 @@ using UnityEngine;
 
 public interface IGameBullet
 {
-    abstract void UpdateBullet(Vector3 direction);
+    abstract void OnCollisionEnter(Collision collision);
+    abstract void ShootBullet(Vector3 direction);
     abstract void Update();
     abstract void DestoryBullet();
 }

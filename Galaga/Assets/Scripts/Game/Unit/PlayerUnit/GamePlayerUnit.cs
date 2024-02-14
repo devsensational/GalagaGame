@@ -5,14 +5,13 @@ using UnityEngine.Pool;
 
 public class GamePlayerUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 {
-    //ObjectPool
-    private IObjectPool<IGameBullet> GameBulletObjectPool;
-    
-
+    //Inspector
+    [Header("Player Unit Inspector")]
+    [SerializeField] private GameObject Bullet;
 
     public void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.CompareTag("bullet"))
+        if(collision.gameObject.CompareTag("EnemyBullet"))
         {
             UnitHit();
         }
@@ -20,6 +19,7 @@ public class GamePlayerUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 
     public void UnitAttack()
     {
+        //Object Pool에서 꺼내올 것 
         Debug.Log("player attack");
     }
 
@@ -39,9 +39,9 @@ public class GamePlayerUnit : GameUnit, IGameUnitAttack, IGameUnitHit
         transform.Translate(direction * moveSpeed * moveSpeedMultiplier * Time.deltaTime);
     }
 
-    void Start()
+    void Awake()
     {
-        
+
     }
 
     void Update()

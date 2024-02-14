@@ -1,32 +1,49 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using UnityEngine.UIElements;
 
-public class GameBullet : MonoBehaviour, IGameBullet
+public class GameBullet : GameUnit, IGameBullet
 {
     //Inspector
-    public float BulletSpeed;
-    public float BulletSpeedMultiplier;
+    [Header ("Bullet Inspector")]
+    public float destroyTime;
 
     //protected
-    protected Vector3 direction;
+    protected IObjectPool<GameUnit> gameBulletPool;
+    protected Vector3                 direction;
 
-    //private
-    private IObjectPool<GameBullet> gameBulletPool;
-
-    public GameBullet(Vector3 direction) {  this.direction = direction; }
-
-    public void UpdateBullet(Vector3 direction)
+    public void ShootBullet(Vector3 direction)
     {
+        this.direction = direction;
+        Invoke("DestroyBullet", destroyTime);
+    }
 
+    public void ShootBullet(Vector3 direction, float destroyTime)
+    {
+        this.destroyTime = destroyTime;
+        ShootBullet(direction);
+    }
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.CompareTag(""))
+        {
+            DestoryBullet();
+        }
+    }
+    public void UpdateBullet()
+    {
+        gameObject.transform.Translate(direction * moveSpeed * moveSpeedMultiplier * Time.deltaTime);
     }
 
     public void ChildUpdate() { }
 
     public void Update()
     {
-        UpdateBullet(direction);
+        UpdateBullet();
         ChildUpdate();
     }
 
@@ -34,7 +51,7 @@ public class GameBullet : MonoBehaviour, IGameBullet
     {
         if (gameBulletPool != null) 
         {
-            gameBulletPool.Release(this);
+            //ÃÑ¾Ë ÆÄ±« ±â´É Ãß°¡
         }
     }
 }

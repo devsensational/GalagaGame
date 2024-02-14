@@ -6,22 +6,30 @@ using UnityEngine;
 public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 {
     //Inspector Field
-    [SerializeField] private int Score;
-    [SerializeField] private TextAsset PattenFile;
-
+    [Header("Enemy Unit Inspector")]
+    [SerializeField] private int        Score;
+    [SerializeField] private TextAsset  PattenFile;
+    [SerializeField] private GameObject Bullet;
     public void OnCollisionEnter(Collision collision)
     {
-        throw new System.NotImplementedException();
+        if(collision.gameObject.CompareTag("PlayerBullet"))
+        {
+            UnitHit();
+        }
+        else if (collision.gameObject.CompareTag("PlayerUnit"))
+        {
+            UnitHit();
+        }
     }
 
     public void UnitAttack()
     {
-        throw new System.NotImplementedException();
+
     }
 
     public void UnitHit()
-    {
-        throw new System.NotImplementedException();
+    { 
+
     }
 
     void Awake() { }

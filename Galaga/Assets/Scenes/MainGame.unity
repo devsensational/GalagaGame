@@ -324,7 +324,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Hp: 1
-  moveSpeed: 1
+  moveSpeed: 4
   moveSpeedMultiplier: 1
 --- !u!114 &163913948
 MonoBehaviour:
@@ -454,6 +454,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BulletSpeed: 1
   BulletSpeedMultiplier: 1
+  destroyTime: 0
 --- !u!212 &922285464
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -553,6 +554,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BulletSpeed: 1
   BulletSpeedMultiplier: 1
+  destroyTime: 0
 --- !u!212 &1512315173
 SpriteRenderer:
   m_ObjectHideFlags: 0

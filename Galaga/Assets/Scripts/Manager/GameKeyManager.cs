@@ -6,13 +6,13 @@ public enum KeyValues
 {
     None    = 0,
 
-    //여기서 부터 작성
+    //아래에 Enum값 작성
     UP,
     DOWN, 
     LEFT, 
     RIGHT,
     FIRE,
-    //
+    //Enum end
 
     End = 300
 }
@@ -37,11 +37,11 @@ public class GameKeyManager : MonoSingleton<GameKeyManager>
 
         KeyValuePairs.Add(KeyValues.LEFT, KeyCode.LeftArrow);
         KeyValuePairs.Add(KeyValues.RIGHT, KeyCode.RightArrow);
-        KeyValuePairs.Add(KeyValues.RIGHT, KeyCode.Z);
+        KeyValuePairs.Add(KeyValues.FIRE, KeyCode.Z);
     }
 
-    private KeyCode KeyDetect()
+    public void KeyChange(KeyValues keyValue, KeyCode keyCode)
     {
-        return KeyCode.None;
+        KeyValuePairs[keyValue] = keyCode;
     }
 }

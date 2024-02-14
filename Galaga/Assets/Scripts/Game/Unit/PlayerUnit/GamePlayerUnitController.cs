@@ -13,6 +13,7 @@ public class GamePlayerUnitController : MonoBehaviour
         keyValuePairs = GameKeyManager.Instance.KeyValuePairs;
         playerUnit = gameObject.GetComponent <GamePlayerUnit>() ;
     }
+
     private void Update()
     {
         if (Input.GetKey(keyValuePairs[KeyValues.LEFT]))

@@ -4,5 +4,8 @@ using UnityEngine;
 
 public class GameEnemyBoss : GameEnemyUnit
 {
+    public void StartPattern()
+    {
 
+    }
 }

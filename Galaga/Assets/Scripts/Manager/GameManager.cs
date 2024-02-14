@@ -10,9 +10,6 @@ public class GameManager : MonoSingleton<GameManager>
     private int Score { get; set; }
     private int StageLevel { get; set; }
 
-    //ObjectPool
-    private Dictionary<string, IObjectPool<GameObject>> ObjectPool { get; set; }
-
     protected override void ChildAwake()
     {
         DontDestroyOnLoad(this.gameObject);
@@ -26,6 +23,6 @@ public class GameManager : MonoSingleton<GameManager>
 
     private void Init()
     {
-        ObjectPool = new Dictionary<string, IObjectPool<GameObject>> { };
+
     }
 }
