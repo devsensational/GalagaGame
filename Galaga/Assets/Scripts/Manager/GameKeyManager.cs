@@ -23,6 +23,7 @@ public class GameKeyManager : MonoSingleton<GameKeyManager>
 
     protected override void ChildAwake()
     {
+        DontDestroyOnLoad(this);
         Init();
     }
 

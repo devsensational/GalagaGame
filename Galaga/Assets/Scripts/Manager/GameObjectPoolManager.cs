@@ -25,7 +25,7 @@ public class GameObjectPoolManager : MonoSingleton<GameObjectPoolManager>
 
     protected override void ChildAwake()
     {
-
+        DontDestroyOnLoad(this);
     }
 
     protected override void ChildOnDestroy()

@@ -158,6 +158,7 @@ MonoBehaviour:
   moveSpeedMultiplier: 1
   Score: 0
   PattenFile: {fileID: 0}
+  Bullet: {fileID: 0}
 --- !u!212 &97286810
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -199,7 +200,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 295eafa08df07bf48b2e3391b75c4f34, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ab6061a79a236694386b31758eee1139, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -285,7 +286,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: be472e081fea3d3409cd6d96168835f5, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e2560544558133f4298020007428870a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -326,6 +327,7 @@ MonoBehaviour:
   Hp: 1
   moveSpeed: 4
   moveSpeedMultiplier: 1
+  Bullet: {fileID: 0}
 --- !u!114 &163913948
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -396,7 +398,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 77049c490a946cf4a9db4b9a21c0903d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c8e367af7e503754391c46f3ee7d7c91, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -452,8 +454,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 757bf32117ea3d24aa979d93b9fff8ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BulletSpeed: 1
-  BulletSpeedMultiplier: 1
+  Hp: 1
+  moveSpeed: 1
+  moveSpeedMultiplier: 1
   destroyTime: 0
 --- !u!212 &922285464
 SpriteRenderer:
@@ -496,7 +499,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 3d419cf067319d14b8b1f70d92eb260d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: cae2113fae3dab446a972c707a83571d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -552,8 +555,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 757bf32117ea3d24aa979d93b9fff8ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BulletSpeed: 1
-  BulletSpeedMultiplier: 1
+  Hp: 1
+  moveSpeed: 1
+  moveSpeedMultiplier: 1
   destroyTime: 0
 --- !u!212 &1512315173
 SpriteRenderer:
@@ -596,7 +600,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 3d419cf067319d14b8b1f70d92eb260d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: cae2113fae3dab446a972c707a83571d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -772,7 +776,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: c717a297ee549f141af07f4d4c198996, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bb0b67902af4ebf40886a83c0ba45207, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
