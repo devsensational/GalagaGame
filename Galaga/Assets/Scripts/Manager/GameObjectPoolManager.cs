@@ -20,12 +20,75 @@ public enum GameUnitObjectType
 
 public class GameObjectPoolManager : MonoSingleton<GameObjectPoolManager>
 {
-    public Dictionary<GameUnitObjectType, List<GameUnit>> ObjectPool { get; set; }
+    //public
+    public Dictionary<GameUnitObjectType, List<GameObject>> ObjectPool { get; set; }
+    public Dictionary<GameUnitObjectType, GameObject>       ObjectPoolType { get; set; }
+    public Dictionary<GameUnitObjectType, int>              ObjectPoolMax { get; set; }
 
+    public GameObject OnGetGameObject(GameUnitObjectType GUOType)
+    {
+        if (!ObjectPool.ContainsKey(GUOType)) 
+        { 
+            Debug.Log("This ObjectPool has empty"); 
+            return null; 
+        }
+        if (ObjectPool[GUOType].Count == 0) return NewCreateGameObject(GUOType);
+
+        GameObject ptr;
+        ptr = ObjectPool[GUOType][0];
+        ObjectPool[GUOType].RemoveAt(0);
+        return ptr;
+    }
+
+    public void OnReleaseGameObject(GameUnitObjectType GUOType, GameObject gameObject)
+    {
+        if (!ObjectPool.ContainsKey(GUOType)) 
+        { 
+            Debug.Log("This ObjectPool has empty"); 
+            return; 
+        }
+        if (ObjectPool[GUOType].Count > ObjectPoolMax[GUOType]) 
+        { 
+            Destroy(gameObject); 
+            return; 
+        }
+        ObjectPool[GUOType].Add(gameObject);
+        gameObject.SetActive(false);
+    }
+
+    public void CreateGameObjectPool(GameUnitObjectType GUOType, GameObject gameObject, int maxValue)
+    {
+        if (ObjectPool.ContainsKey(GUOType)){ Debug.Log("Already created this objectpool");  return; }
+        else
+        {
+            ObjectPool.Add(GUOType, new List<GameObject>());
+            ObjectPoolMax.Add(GUOType, maxValue);
+            ObjectPoolType.Add(GUOType, gameObject);
+            GameObject ptr;
+            for (int i = 0; i < ObjectPoolMax[GUOType]; i++)
+            {
+                ptr = NewCreateGameObject(GUOType);
+                ptr.SetActive(false);
+            }
+        }
+    }
+
+    private GameObject NewCreateGameObject(GameUnitObjectType GUOType)
+    {
+        GameObject ptr;
+        ptr = Instantiate(ObjectPoolType[GUOType]);
+        if (ObjectPool[GUOType].Count > ObjectPoolMax[GUOType]) ObjectPool[GUOType].Add(ptr);
+
+        return ptr;
+    }
 
     protected override void ChildAwake()
     {
         DontDestroyOnLoad(this);
+
+        ObjectPool      = new Dictionary<GameUnitObjectType, List<GameObject>>();
+        ObjectPoolType  = new Dictionary<GameUnitObjectType, GameObject>();
+        ObjectPoolMax   = new Dictionary<GameUnitObjectType, int>();
     }
 
     protected override void ChildOnDestroy()

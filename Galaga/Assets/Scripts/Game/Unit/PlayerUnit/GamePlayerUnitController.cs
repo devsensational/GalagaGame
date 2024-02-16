@@ -20,11 +20,11 @@ public class GamePlayerUnitController : MonoBehaviour
         {
             playerUnit.UnitMoveControl(Vector3.left);
         } 
-        else if (Input.GetKey(keyValuePairs[KeyValues.RIGHT]))
+        if (Input.GetKey(keyValuePairs[KeyValues.RIGHT]))
         {
             playerUnit.UnitMoveControl(Vector3.right);
         }
-        else if (Input.GetKeyDown(keyValuePairs[KeyValues.FIRE]))
+        if (Input.GetKeyDown(keyValuePairs[KeyValues.FIRE]))
         {
             playerUnit.UnitAttack();
         }

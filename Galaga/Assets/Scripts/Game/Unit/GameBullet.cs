@@ -12,8 +12,10 @@ public class GameBullet : GameUnit, IGameBullet
     public float destroyTime;
 
     //protected
-    protected IObjectPool<GameUnit> gameBulletPool;
-    protected Vector3                 direction;
+    protected Vector3             direction;
+
+    //private
+    private GameObjectPoolManager poolManager;
 
     public void ShootBullet(Vector3 direction)
     {
@@ -31,7 +33,7 @@ public class GameBullet : GameUnit, IGameBullet
     {
         if(collision.gameObject.CompareTag(""))
         {
-            DestoryBullet();
+            DestroyBullet();
         }
     }
     public void UpdateBullet()
@@ -47,11 +49,16 @@ public class GameBullet : GameUnit, IGameBullet
         ChildUpdate();
     }
 
-    public void DestoryBullet()
+    public void Awake()
     {
-        if (gameBulletPool != null) 
+        poolManager = GameObjectPoolManager.Instance;
+    }
+
+    public void DestroyBullet()
+    {
+        if (poolManager != null) 
         {
-            //ÃÑ¾Ë ÆÄ±« ±â´É Ãß°¡
+            poolManager.OnReleaseGameObject(GameUnitObjectType.BULLET, gameObject);
         }
     }
 }

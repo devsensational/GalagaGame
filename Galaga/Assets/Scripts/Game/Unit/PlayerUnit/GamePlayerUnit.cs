@@ -9,6 +9,10 @@ public class GamePlayerUnit : GameUnit, IGameUnitAttack, IGameUnitHit
     [Header("Player Unit Inspector")]
     [SerializeField] private GameObject Bullet;
 
+    //private
+    GameObjectPoolManager poolManager;
+    GameObject bulletPtr;
+
     public void OnCollisionEnter(Collision collision)
     {
         if(collision.gameObject.CompareTag("EnemyBullet"))
@@ -19,8 +23,10 @@ public class GamePlayerUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 
     public void UnitAttack()
     {
-        //Object Pool에서 꺼내올 것 
-        Debug.Log("player attack");
+        bulletPtr = poolManager.OnGetGameObject(GameUnitObjectType.BULLET);
+        bulletPtr.transform.position = gameObject.transform.position;
+        bulletPtr.SetActive(true);
+        bulletPtr.GetComponent<GameBullet>().ShootBullet(Vector3.up);
     }
 
     public void UnitHit()
@@ -41,7 +47,8 @@ public class GamePlayerUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 
     void Awake()
     {
-
+        poolManager = GameObjectPoolManager.Instance;
+        poolManager.CreateGameObjectPool(GameUnitObjectType.BULLET, Bullet, 3);
     }
 
     void Update()

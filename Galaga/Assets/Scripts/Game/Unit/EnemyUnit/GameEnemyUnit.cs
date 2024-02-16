@@ -7,9 +7,9 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 {
     //Inspector Field
     [Header("Enemy Unit Inspector")]
-    [SerializeField] private int        Score;
-    [SerializeField] private List<TextAsset>  PattenFile;
-    [SerializeField] private GameObject Bullet;
+    [SerializeField] private int                Score;
+    [SerializeField] private List<TextAsset>    PattenFile;
+    [SerializeField] private GameObject         Bullet;
     public void OnCollisionEnter(Collision collision)
     {
         if(collision.gameObject.CompareTag("PlayerBullet"))
