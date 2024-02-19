@@ -19,7 +19,7 @@ public enum KeyValues
 public class GameKeyManager : MonoSingleton<GameKeyManager>
 {
     //public
-    public Dictionary<KeyValues, KeyCode> KeyValuePairs { get; set; }
+    public Dictionary<KeyValues, KeyCode> KeyValuePairs { get; private set; }
 
     protected override void ChildAwake()
     {
@@ -32,7 +32,7 @@ public class GameKeyManager : MonoSingleton<GameKeyManager>
 
     }
 
-    private void Init()
+    public void Init()
     {
         KeyValuePairs = new Dictionary<KeyValues, KeyCode>();
 

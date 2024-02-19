@@ -16,6 +16,7 @@ public class GameBullet : GameUnit, IGameBullet
 
     //private
     private GameObjectPoolManager poolManager;
+    private GameUnitObjectType    type;
 
     public void ShootBullet(Vector3 direction)
     {
@@ -26,6 +27,12 @@ public class GameBullet : GameUnit, IGameBullet
     public void ShootBullet(Vector3 direction, float destroyTime)
     {
         this.destroyTime = destroyTime;
+        ShootBullet(direction);
+    }
+
+    public void ShootBullet(Vector3 direction, string tag)
+    {
+        gameObject.tag = tag;
         ShootBullet(direction);
     }
 
@@ -58,7 +65,7 @@ public class GameBullet : GameUnit, IGameBullet
     {
         if (poolManager != null) 
         {
-            poolManager.OnReleaseGameObject(GameUnitObjectType.BULLET, gameObject);
+            poolManager.OnReleaseGameObject(type, gameObject);
         }
     }
 }

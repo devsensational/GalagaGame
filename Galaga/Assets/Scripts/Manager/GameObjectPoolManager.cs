@@ -10,9 +10,10 @@ public enum GameUnitObjectType
 
     //아래에 Enum값 작성
     UNIT        = 1,
-    BULLET      = 2,
-    PLAYERUNIT  = 3,
-    ENEMYUNIT   = 4,
+    PLAYERUNIT,
+    PLAYERBULLET,
+    ENEMYUNIT,
+    ENEMYBULLET,
     //Enum end
 
     END = 99
@@ -20,10 +21,11 @@ public enum GameUnitObjectType
 
 public class GameObjectPoolManager : MonoSingleton<GameObjectPoolManager>
 {
+
     //public
-    public Dictionary<GameUnitObjectType, List<GameObject>> ObjectPool { get; set; }
-    public Dictionary<GameUnitObjectType, GameObject>       ObjectPoolType { get; set; }
-    public Dictionary<GameUnitObjectType, int>              ObjectPoolMax { get; set; }
+    public Dictionary<GameUnitObjectType, List<GameObject>> ObjectPool { get; private set; }
+    public Dictionary<GameUnitObjectType, GameObject>       ObjectPoolType { get; private set; }
+    public Dictionary<GameUnitObjectType, int>              ObjectPoolMax { get; private set; }
 
     public GameObject OnGetGameObject(GameUnitObjectType GUOType)
     {
@@ -82,13 +84,17 @@ public class GameObjectPoolManager : MonoSingleton<GameObjectPoolManager>
         return ptr;
     }
 
-    protected override void ChildAwake()
+    public void Init()
     {
-        DontDestroyOnLoad(this);
-
         ObjectPool      = new Dictionary<GameUnitObjectType, List<GameObject>>();
         ObjectPoolType  = new Dictionary<GameUnitObjectType, GameObject>();
         ObjectPoolMax   = new Dictionary<GameUnitObjectType, int>();
+    }
+
+    protected override void ChildAwake()
+    {
+        DontDestroyOnLoad(this);
+        Init();
     }
 
     protected override void ChildOnDestroy()

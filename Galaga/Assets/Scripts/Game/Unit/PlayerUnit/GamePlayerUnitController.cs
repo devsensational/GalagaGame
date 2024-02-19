@@ -5,13 +5,13 @@ using UnityEngine;
 public class GamePlayerUnitController : MonoBehaviour
 {
     //private
-    Dictionary<KeyValues, KeyCode> keyValuePairs;
-    GamePlayerUnit playerUnit;
+    Dictionary<KeyValues, KeyCode>  keyValuePairs;
+    GamePlayerUnit                  playerUnit;
 
-    private void Awake()
+    private void Start()
     {
-        keyValuePairs = GameKeyManager.Instance.KeyValuePairs;
-        playerUnit = gameObject.GetComponent <GamePlayerUnit>() ;
+        keyValuePairs   = GameKeyManager.Instance.KeyValuePairs;
+        playerUnit      = gameObject.GetComponent <GamePlayerUnit>() ;
     }
 
     private void Update()
