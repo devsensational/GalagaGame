@@ -30,9 +30,10 @@ public class GameBullet : GameUnit, IGameBullet
         ShootBullet(direction);
     }
 
-    public void ShootBullet(Vector3 direction, string tag)
+    public void ShootBullet(Vector3 direction, GameUnitObjectType GUOType,string tag)
     {
         gameObject.tag = tag;
+        type = GUOType;
         ShootBullet(direction);
     }
 

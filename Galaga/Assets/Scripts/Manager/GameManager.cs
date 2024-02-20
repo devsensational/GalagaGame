@@ -11,6 +11,8 @@ public class GameManager : MonoSingleton<GameManager>
     private GameObject              PlayerUnit;
     [SerializeField]
     public List<GameObject>         EnemyUnitList;
+    [SerializeField]
+    private GameObject              EnemyUnitPlacementGrid;
 
     //public
 
@@ -39,21 +41,38 @@ public class GameManager : MonoSingleton<GameManager>
 
     public void Init()
     {
-        gameEventManager    = GameEventManager.Instance;
-        gameKeyManager      = GameKeyManager.Instance;
-        gamePoolManager     = GameObjectPoolManager.Instance;
+        gameEventManager        = GameEventManager.     Instance;
+        gameKeyManager          = GameKeyManager.       Instance;
+        gamePoolManager         = GameObjectPoolManager.Instance;
 
-        gameEventManager.AddEvent(GameStatus.GameStart,         GameStart);
-        gameEventManager.AddEvent(GameStatus.GameInProgress,    GameProgress);
+        gameEventManager.AddEvent(GameStatus.GAMESTART,         OnGameStart);
+        gameEventManager.AddEvent(GameStatus.GAMERESET,         OnGameReset);
+        gameEventManager.AddEvent(GameStatus.GAMEINPROGRESS,    OnGameProgress);
     }
 
-    private void GameStart(params object[] para)
+    public void StartGameFirst()
+    {
+        gameEventManager.OnTriggerGameEvent(GameStatus.GAMERESET);
+    }
+
+    private void OnGameReset()
+    {
+        Debug.Log("Game restart from GameManager");
+
+        gameStatus = GameStatus.GAMERESET;
+        gameEventManager.OnTriggerGameEvent(GameStatus.GAMESTART);
+    }
+
+    private void OnGameStart()
     {
         Debug.Log("Game start from GameManager");
+
+        gameStatus = GameStatus.GAMESTART;
         Instantiate(PlayerUnit);
+        //gameEventManager.OnTriggerGameEvent(GameStatus.GAMESTART);
     }
 
-    private void GameProgress(params object[] para)
+    private void OnGameProgress()
     {
 
     }

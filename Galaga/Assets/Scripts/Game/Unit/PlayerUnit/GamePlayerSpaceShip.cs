@@ -5,13 +5,4 @@ using UnityEngine;
 public class GamePlayerSpaceShip : GamePlayerUnit
 {
 
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
-    }
 }

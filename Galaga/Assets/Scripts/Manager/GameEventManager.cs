@@ -8,17 +8,17 @@ public enum GameStatus
     UNKNOWN,
 
     //아래에 Enum 값 작성
-    GameStart,
-    GameInProgress,
-    GameReset,
-    GameStop,
-    PlayerDead,
-    PlayerCaptured,
-    StageClear,
-    GameOver,
+    GAMESTART,
+    GAMEINPROGRESS,
+    GAMERESET,
+    GAMESTOP,
+    PLAYERDEAD,
+    PLAYERCAPTURED,
+    STAGECLEAR,
+    GAMEOVER,
     //Enum End
 
-    End = 99
+    END = 99
 }
 
 
@@ -26,7 +26,7 @@ public class GameEventManager : MonoSingleton<GameEventManager>
 {
     public Dictionary<GameStatus, funcType1> EventDictionary { get; private set; }
 
-    public delegate void funcType1(params object[] para);
+    public delegate void funcType1();
 
     public GameStatus GameStatusNow { get; private set; }
     public void AddEvent(GameStatus status, funcType1 func)

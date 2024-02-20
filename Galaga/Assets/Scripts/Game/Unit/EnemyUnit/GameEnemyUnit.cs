@@ -54,6 +54,7 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
     public void UnitHit()
     {
         Hp -= 1;
+        CheckUnitDead();
     }
 
     private Vector3 AimPlayerUnit()
@@ -61,6 +62,11 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
         if (PlayerUnit != null) { return Vector3.zero; }
         Vector3 direction = gameObject.transform.position - PlayerUnit.transform.position;
         return direction.normalized;
+    }
+
+    private void CheckUnitDead()
+    {
+
     }
 
     void Awake() 

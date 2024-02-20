@@ -5,4 +5,11 @@ using UnityEngine;
 public class GameEnemyUnitPlacementController : MonoBehaviour
 {
 
+    void Init()
+    {
+    }
+
+    public void Awake()
+    {
+    }
 }

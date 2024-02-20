@@ -5,5 +5,4 @@ using UnityEngine;
 public interface IGameUnitHit
 {
     abstract void UnitHit();
-    abstract void OnCollisionEnter(Collision collision);
 }

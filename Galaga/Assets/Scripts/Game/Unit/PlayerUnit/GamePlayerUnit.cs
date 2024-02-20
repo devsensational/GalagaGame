@@ -29,11 +29,13 @@ public class GamePlayerUnit : GameUnit, IGameUnitAttack, IGameUnitHit
     //private
     PlayerUnitStatus        status;
     GameObjectPoolManager   poolManager;
+    GameEventManager        gameEventManager;
     GameObject              bulletPtr;
 
-    public void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.CompareTag("EnemyBullet"))
+        Debug.Log(collision.ToString());
+        if (collision.gameObject.CompareTag("EnemyBullet"))
         {
             UnitHit();
         }
@@ -44,18 +46,16 @@ public class GamePlayerUnit : GameUnit, IGameUnitAttack, IGameUnitHit
         bulletPtr = poolManager.OnGetGameObject(GameUnitObjectType.PLAYERBULLET);
         bulletPtr.transform.position = gameObject.transform.position;
         bulletPtr.SetActive(true);
-        bulletPtr.GetComponent<GameBullet>().ShootBullet(Vector3.up, "PlayerBullet");
+        bulletPtr.GetComponent<GameBullet>().ShootBullet(Vector3.up, GameUnitObjectType.PLAYERBULLET, "PlayerBullet");
     }
 
     public void UnitHit()
     {
         Hp -= 1;
-        CheckPlayerDead();
-    }
-
-    private bool CheckPlayerDead()
-    {
-        if (Hp <= 0) return true; return false;
+        if(Hp <= 0)
+        {
+            gameEventManager.OnTriggerGameEvent(GameStatus.PLAYERDEAD);
+        }
     }
 
     public void UnitMoveControl(Vector3 direction)
@@ -63,12 +63,27 @@ public class GamePlayerUnit : GameUnit, IGameUnitAttack, IGameUnitHit
         transform.Translate(direction * moveSpeed * moveSpeedMultiplier * Time.deltaTime);
     }
 
+    private void OnUnitDead()
+    {
+        Debug.Log("Player unit dead");
+        Destroy(gameObject);
+    }
+
     void Awake()
     {
         status      = PlayerUnitStatus.DEFAULT;
-        poolManager = GameObjectPoolManager.Instance;
+
+    }
+
+    void Start()
+    {
+        poolManager         = GameObjectPoolManager.Instance;
+        gameEventManager    = GameEventManager.Instance;
 
         poolManager.CreateGameObjectPool(GameUnitObjectType.PLAYERBULLET, Bullet, 3);
+
+        gameEventManager.AddEvent(GameStatus.PLAYERDEAD, OnUnitDead);
+        Debug.Log("Unit init complete");
     }
 
     void Update()

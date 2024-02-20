@@ -60,18 +60,23 @@ public class GameObjectPoolManager : MonoSingleton<GameObjectPoolManager>
 
     public void CreateGameObjectPool(GameUnitObjectType GUOType, GameObject gameObject, int maxValue)
     {
-        if (ObjectPool.ContainsKey(GUOType)){ Debug.Log("Already created this objectpool");  return; }
+        if (ObjectPool.ContainsKey(GUOType))
+        {
+            Debug.Log("Already created this objectpool");  
+            return; 
+        }
         else
         {
-            ObjectPool.Add(GUOType, new List<GameObject>());
-            ObjectPoolMax.Add(GUOType, maxValue);
-            ObjectPoolType.Add(GUOType, gameObject);
+            ObjectPool.     Add(GUOType, new List<GameObject>());
+            ObjectPoolMax.  Add(GUOType, maxValue);
+            ObjectPoolType. Add(GUOType, gameObject);
             GameObject ptr;
             for (int i = 0; i < ObjectPoolMax[GUOType]; i++)
             {
                 ptr = NewCreateGameObject(GUOType);
                 ptr.SetActive(false);
             }
+            Debug.Log("Create ObjectPool: " + GUOType.ToString());
         }
     }
 
