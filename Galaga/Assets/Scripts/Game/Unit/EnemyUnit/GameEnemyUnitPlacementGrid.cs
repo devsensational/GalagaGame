@@ -8,14 +8,13 @@ public class GameEnemyUnitPlacementGrid : MonoBehaviour, IGameEnemyUnitPlacement
     public TextAsset UnitPlacementFile;
 
     //public
-    public byte[,]   UnitPlacementGrid {  get; private set; }
+    public byte[,] UnitPlacementGrid {  get; private set; }
+    public int     UnitCount         { get; set; }
 
-    //private 
-    private List<GameObject>    unitList;
+    //private
     private GameEventManager    gameEventManager;
     private int                 width;
     private int                 height;
-    private int                 UnitCount;
 
     public void OnUnitPlace()
     {
@@ -32,6 +31,8 @@ public class GameEnemyUnitPlacementGrid : MonoBehaviour, IGameEnemyUnitPlacement
     public void OnResetGrid()
     {
         UnitPlacementGrid = FileUtilityManager.Instance.CSVUtil.ReadCSV(UnitPlacementFile);
+        Debug.Log("GameEnemyUnitPlaceGird reset complete");
+
     }
 
     private void CalculateUnitPosition(int idx, out int row, out int col)
@@ -42,17 +43,21 @@ public class GameEnemyUnitPlacementGrid : MonoBehaviour, IGameEnemyUnitPlacement
     private void Init()
     {
         UnitPlacementGrid   = FileUtilityManager.Instance.CSVUtil.ReadCSV(UnitPlacementFile);
-        unitList            = GameManager.Instance.EnemyUnitList;
         gameEventManager    = GameEventManager.Instance;
         width               = UnitPlacementGrid.GetLength(0);
         height              = UnitPlacementGrid.GetLength(1);
 
-        gameEventManager.AddEvent(GameStatus.GAMERESET, OnResetGrid);
+        Debug.Log("GameEnemyUnitPlaceGird init complete");
     }
 
     void Start()
     {
+        Init();
+    }
 
+    void Awake()
+    {
+        DontDestroyOnLoad(this);
     }
 
 }

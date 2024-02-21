@@ -10,5 +10,4 @@ public class GameUnit : MonoBehaviour
     [SerializeField] protected float    moveSpeed           = 1f;
     [SerializeField] protected float    moveSpeedMultiplier = 1f;
 
-    public void UnitMovement() { }
 }

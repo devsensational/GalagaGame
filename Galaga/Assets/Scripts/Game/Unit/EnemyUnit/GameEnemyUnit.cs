@@ -33,10 +33,10 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
     //private
     GameObject PlayerUnit;
 
-
-    public void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.CompareTag("PlayerBullet"))
+        Debug.Log("Enemy Unit hit from " + collision.gameObject);
+        if (collision.gameObject.CompareTag("PlayerBullet"))
         {
             UnitHit();
         }
@@ -45,7 +45,6 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
             UnitHit();
         }
     }
-
     public void UnitAttack()
     {
         
@@ -66,7 +65,11 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 
     private void CheckUnitDead()
     {
-
+        if (Hp <= 0)
+        {
+            GameManager.Instance.Score += this.Score;
+            Destroy(gameObject);
+        }
     }
 
     void Awake() 
@@ -76,7 +79,7 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 
     void Update() 
     {
-        AimPlayerUnit();
+        //AimPlayerUnit();
     }
 
 }

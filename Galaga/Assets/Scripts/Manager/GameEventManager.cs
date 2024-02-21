@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum GameStatus 
@@ -11,7 +12,8 @@ public enum GameStatus
     GAMESTART,
     GAMEINPROGRESS,
     GAMERESET,
-    GAMESTOP,
+    GAMEPAUSE,
+    GAMEEXIT,
     PLAYERDEAD,
     PLAYERCAPTURED,
     STAGECLEAR,
@@ -31,22 +33,37 @@ public class GameEventManager : MonoSingleton<GameEventManager>
     public GameStatus GameStatusNow { get; private set; }
     public void AddEvent(GameStatus status, funcType1 func)
     {
-        checkEventDictionaryIsNull();
+        if (checkEventDictionaryIsNull()) return;
 
-        if(!EventDictionary.ContainsKey(status)) 
+        // 키가 존재하며 대리자가 아직 추가되지 않았는지 확인
+        if (EventDictionary.ContainsKey(status))
         {
-            EventDictionary.Add(status, func);
+            if (EventDictionary[status] != null && !EventDictionary[status].GetInvocationList().Contains(func))
+            {
+                EventDictionary[status] += func;
+            }
         }
+        else
+        {
+            EventDictionary.Add(status, null);
+            EventDictionary[status] += func;
+        }
+    }
 
-        EventDictionary[status] += func;
+    public void RemoveEvent(GameStatus status, funcType1 func)
+    {
+        if (checkEventDictionaryIsNull()) return;
+        if (!EventDictionary.ContainsKey(status)) return;
+        EventDictionary[status] -= func;
     }
 
     public void OnTriggerGameEvent(GameStatus status)
     {
-        checkEventDictionaryIsNull();
-        if(!EventDictionary.ContainsKey(status))
+        if (checkEventDictionaryIsNull()) return;
+        if (!EventDictionary.ContainsKey(status))
         {
             Debug.Log("This status empty");
+            return;
         }
 
         EventDictionary[status]();

@@ -12,11 +12,11 @@ public class GameBullet : GameUnit, IGameBullet
     public float destroyTime;
 
     //protected
-    protected Vector3             direction;
-
+    protected Vector3               direction;
+    protected GameObjectPoolManager poolManager;
+    protected GameObject            BulletParent;
+    protected GameUnitObjectType    type;
     //private
-    private GameObjectPoolManager poolManager;
-    private GameUnitObjectType    type;
 
     public void ShootBullet(Vector3 direction)
     {
@@ -37,19 +37,15 @@ public class GameBullet : GameUnit, IGameBullet
         ShootBullet(direction);
     }
 
-    public void OnCollisionEnter(Collision collision)
+    public void SetBulletParent(GameObject BulletParent)
     {
-        if(collision.gameObject.CompareTag(""))
-        {
-            DestroyBullet();
-        }
+        this.BulletParent = BulletParent;
     }
+
     public void UpdateBullet()
     {
         gameObject.transform.Translate(direction * moveSpeed * moveSpeedMultiplier * Time.deltaTime);
     }
-
-    public void ChildUpdate() { }
 
     public void Update()
     {
@@ -60,13 +56,20 @@ public class GameBullet : GameUnit, IGameBullet
     public void Awake()
     {
         poolManager = GameObjectPoolManager.Instance;
+        ChildAwake();
     }
 
-    public void DestroyBullet()
+    virtual public void DestroyBullet()
     {
         if (poolManager != null) 
         {
+            //Bullet이 사라질 때 코드를 해당 주석 사이에 작성해야 함
+
+            //
             poolManager.OnReleaseGameObject(type, gameObject);
         }
     }
+    virtual protected void ChildUpdate() { }
+    virtual protected void ChildAwake() { }
+
 }

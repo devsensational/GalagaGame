@@ -15,14 +15,14 @@ public class GameManager : MonoSingleton<GameManager>
     private GameObject              EnemyUnitPlacementGrid;
 
     //public
+    public int Score { get; set; }
+    public int StageLevel { get; set; }
 
     //private
     private GameEventManager        gameEventManager;
     private GameKeyManager          gameKeyManager;
     private GameObjectPoolManager   gamePoolManager;
     private GameStatus              gameStatus;
-    private int Score               { get; set; }
-    private int StageLevel          { get; set; }
 
     protected override void ChildAwake()
     {
@@ -69,7 +69,6 @@ public class GameManager : MonoSingleton<GameManager>
 
         gameStatus = GameStatus.GAMESTART;
         Instantiate(PlayerUnit);
-        //gameEventManager.OnTriggerGameEvent(GameStatus.GAMESTART);
     }
 
     private void OnGameProgress()

@@ -25,12 +25,16 @@ public class GamePlayerUnit : GameUnit, IGameUnitAttack, IGameUnitHit
     //Inspector
     [Header("Player Unit Inspector")]
     [SerializeField] private GameObject Bullet;
+    [SerializeField] private int        MaxBulletCount;
+
+    //public
+    public int                      BulletCount { get; set; }
 
     //private
-    PlayerUnitStatus        status;
-    GameObjectPoolManager   poolManager;
-    GameEventManager        gameEventManager;
-    GameObject              bulletPtr;
+    private PlayerUnitStatus        status;
+    private GameObjectPoolManager   poolManager;
+    private GameEventManager        gameEventManager;
+    private GameObject              bulletPtr;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -43,10 +47,15 @@ public class GamePlayerUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 
     public void UnitAttack()
     {
-        bulletPtr = poolManager.OnGetGameObject(GameUnitObjectType.PLAYERBULLET);
-        bulletPtr.transform.position = gameObject.transform.position;
-        bulletPtr.SetActive(true);
-        bulletPtr.GetComponent<GameBullet>().ShootBullet(Vector3.up, GameUnitObjectType.PLAYERBULLET, "PlayerBullet");
+        if(BulletCount < MaxBulletCount) 
+        {
+            bulletPtr = poolManager.OnGetGameObject(GameUnitObjectType.PLAYERBULLET);
+            bulletPtr.transform.position = gameObject.transform.position;
+            bulletPtr.GetComponent<IGameBullet>().SetBulletParent(gameObject);
+            bulletPtr.SetActive(true);
+            bulletPtr.GetComponent<IGameBullet>().ShootBullet(Vector3.up, GameUnitObjectType.PLAYERBULLET, "PlayerBullet");
+            BulletCount++;
+        }
     }
 
     public void UnitHit()

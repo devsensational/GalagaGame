@@ -104,6 +104,7 @@ MonoBehaviour:
   moveSpeed: 4
   moveSpeedMultiplier: 1
   Bullet: {fileID: 1662882732131242402, guid: 9ff5f32f3c1d47a4d9f2e4b96458b838, type: 3}
+  MaxBulletCount: 2
 --- !u!114 &5609229088134908659
 MonoBehaviour:
   m_ObjectHideFlags: 0

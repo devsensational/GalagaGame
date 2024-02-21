@@ -8,6 +8,5 @@ public class GameStartButton : MonoBehaviour
     public void StartGame()
     {
         SceneManager.LoadScene("MainGame");
-        GameManager.Instance.StartGameFirst();
     }
 }
