@@ -15,8 +15,8 @@ public class GameManager : MonoSingleton<GameManager>
     private GameObject              EnemyUnitPlacementGrid;
 
     //public
-    public int Score { get; set; }
-    public int StageLevel { get; set; }
+    public int Score        { get; private set; }
+    public int StageLevel   { get; set; }
 
     //private
     private GameEventManager        gameEventManager;
@@ -41,6 +41,9 @@ public class GameManager : MonoSingleton<GameManager>
 
     public void Init()
     {
+        Score = 0;
+        StageLevel = 0;
+
         gameEventManager        = GameEventManager.     Instance;
         gameKeyManager          = GameKeyManager.       Instance;
         gamePoolManager         = GameObjectPoolManager.Instance;
@@ -53,6 +56,11 @@ public class GameManager : MonoSingleton<GameManager>
     public void StartGameFirst()
     {
         gameEventManager.OnTriggerGameEvent(GameStatus.GAMERESET);
+    }
+
+    public void OnAddScore(int score)
+    {
+        Score += score;
     }
 
     private void OnGameReset()
@@ -68,7 +76,10 @@ public class GameManager : MonoSingleton<GameManager>
         Debug.Log("Game start from GameManager");
 
         gameStatus = GameStatus.GAMESTART;
-        Instantiate(PlayerUnit);
+        GameObject ptr = Instantiate(PlayerUnit);
+        ptr.name = "SpaceShip";
+
+        gameEventManager.OnTriggerGameEvent(GameStatus.GAMEINPROGRESS);
     }
 
     private void OnGameProgress()

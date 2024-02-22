@@ -28,10 +28,14 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
     [SerializeField] private GameObject         Bullet;
 
     //public
-    int GridPosition { get; set; }
+    public int UnitIndex        { get; set; }
+    public int EnemyUnitType    { get; set; }
 
     //private
-    GameObject PlayerUnit;
+    GameEnemyUnitController enemyUnitController;
+    GameObjectPoolManager   objectPoolManager;
+    GameManager             gameManager;    
+    GameObject              playerUnit;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -40,10 +44,15 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
         {
             UnitHit();
         }
-        else if (collision.gameObject.CompareTag("PlayerUnit"))
+        if (collision.gameObject.CompareTag("PlayerUnit"))
         {
             UnitHit();
         }
+        if (collision.gameObject.CompareTag("Outside"))
+        {
+
+        }
+
     }
     public void UnitAttack()
     {
@@ -58,8 +67,8 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 
     private Vector3 AimPlayerUnit()
     {
-        if (PlayerUnit != null) { return Vector3.zero; }
-        Vector3 direction = gameObject.transform.position - PlayerUnit.transform.position;
+        if (playerUnit != null) { return Vector3.zero; }
+        Vector3 direction = gameObject.transform.position - playerUnit.transform.position;
         return direction.normalized;
     }
 
@@ -67,14 +76,43 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
     {
         if (Hp <= 0)
         {
-            GameManager.Instance.Score += this.Score;
-            Destroy(gameObject);
+            gameManager.OnAddScore(Score);
+            enemyUnitController.RemoveUnit(UnitIndex, gameObject);
         }
+    }
+
+    public Vector3 CalculateBezierPoint(float t, List<Vector3> controlPoints)
+    {
+        int n = controlPoints.Count - 1; // 제어점의 개수에 따른 차수 n
+        Vector3 point = Vector3.zero; // 초기화
+        for (int i = 0; i <= n; i++)
+        {
+            // 이항계수 * (1-t)^(n-i) * t^i
+            float binomialCoefficient = BinomialCoefficient(n, i);
+            float term = binomialCoefficient * Mathf.Pow(1 - t, n - i) * Mathf.Pow(t, i);
+            point += term * controlPoints[i];
+        }
+        return point;
+    }
+
+    private float BinomialCoefficient(int n, int k)
+    {
+        return Factorial(n) / (Factorial(k) * Factorial(n - k));
+    }
+
+    private float Factorial(int n)
+    {
+        float result = 1;
+        for (int i = 2; i <= n; i++)
+            result *= i;
+        return result;
     }
 
     void Awake() 
     {
-        PlayerUnit = GameObject.Find("SpaceShip");
+        playerUnit          = GameObject.Find("SpaceShip");
+        enemyUnitController = GameObject.Find("GameEnemyController").GetComponent<GameEnemyUnitController>();
+        objectPoolManager   = GameObjectPoolManager.Instance;
     }
 
     void Update() 

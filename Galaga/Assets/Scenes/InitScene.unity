@@ -857,6 +857,7 @@ GameObject:
   - component: {fileID: 1344589734}
   - component: {fileID: 1344589733}
   - component: {fileID: 1344589732}
+  - component: {fileID: 1344589738}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -945,6 +946,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1344589738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1344589731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91df8832ae1194845909b35d92032be7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AnimationSpriteList:
+  - sprites:
+    - {fileID: 21300000, guid: 295eafa08df07bf48b2e3391b75c4f34, type: 3}
+    - {fileID: 21300000, guid: d19c065603db00447a177fbb735bf81f, type: 3}
+  - sprites:
+    - {fileID: 21300000, guid: 77049c490a946cf4a9db4b9a21c0903d, type: 3}
+    - {fileID: 21300000, guid: f645bb584d4f55b419bce74326ad0b51, type: 3}
+  - sprites:
+    - {fileID: 21300000, guid: c717a297ee549f141af07f4d4c198996, type: 3}
+    - {fileID: 21300000, guid: 003e0f1079847364bacb7de3ea18fa25, type: 3}
+  - sprites:
+    - {fileID: 21300000, guid: 2cedda89c49f6124f92753222c966877, type: 3}
+    - {fileID: 21300000, guid: cccf1ef621ad83942919ef02ea6b0d3d, type: 3}
 --- !u!1 &1570600145
 GameObject:
   m_ObjectHideFlags: 0

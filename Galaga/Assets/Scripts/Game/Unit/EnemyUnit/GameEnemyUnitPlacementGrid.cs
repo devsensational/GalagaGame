@@ -5,7 +5,9 @@ using UnityEngine;
 public class GameEnemyUnitPlacementGrid : MonoBehaviour, IGameEnemyUnitPlacementGrid
 {
     //Inspector
-    public TextAsset UnitPlacementFile;
+    public TextAsset    UnitPlacementFile;
+    public float        HorizontalSpacing;
+    public float        VerticalSpacing;
 
     //public
     public byte[,] UnitPlacementGrid {  get; private set; }
@@ -21,10 +23,11 @@ public class GameEnemyUnitPlacementGrid : MonoBehaviour, IGameEnemyUnitPlacement
 
     }
 
-    public void OnUnitRemoveAt(int idx)
+    public void UnitRemoveAt(int idx)
     {
         int row, col;
         CalculateUnitPosition(idx, out row, out col);
+        UnitCount--;
         UnitPlacementGrid[row, col] = 0;
     }
 

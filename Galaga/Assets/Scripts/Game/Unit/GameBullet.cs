@@ -21,7 +21,6 @@ public class GameBullet : GameUnit, IGameBullet
     public void ShootBullet(Vector3 direction)
     {
         this.direction = direction;
-        Invoke("DestroyBullet", destroyTime);
     }
 
     public void ShootBullet(Vector3 direction, float destroyTime)
@@ -30,21 +29,24 @@ public class GameBullet : GameUnit, IGameBullet
         ShootBullet(direction);
     }
 
-    public void ShootBullet(Vector3 direction, GameUnitObjectType GUOType,string tag)
-    {
-        gameObject.tag = tag;
-        type = GUOType;
-        ShootBullet(direction);
-    }
-
     public void SetBulletParent(GameObject BulletParent)
     {
         this.BulletParent = BulletParent;
     }
 
-    public void UpdateBullet()
+    private void UpdateBullet()
     {
         gameObject.transform.Translate(direction * moveSpeed * moveSpeedMultiplier * Time.deltaTime);
+    }
+    virtual public void DestroyBullet()
+    {
+        if (poolManager != null || gameObject.activeSelf == false)
+        {
+            //Bullet이 사라질 때 코드를 해당 주석 사이에 작성해야 함
+
+            //
+            poolManager.OnReleaseGameObject(type, gameObject);
+        }
     }
 
     public void Update()
@@ -59,16 +61,6 @@ public class GameBullet : GameUnit, IGameBullet
         ChildAwake();
     }
 
-    virtual public void DestroyBullet()
-    {
-        if (poolManager != null) 
-        {
-            //Bullet이 사라질 때 코드를 해당 주석 사이에 작성해야 함
-
-            //
-            poolManager.OnReleaseGameObject(type, gameObject);
-        }
-    }
     virtual protected void ChildUpdate() { }
     virtual protected void ChildAwake() { }
 

@@ -34,11 +34,11 @@ public class GameObjectPoolManager : MonoSingleton<GameObjectPoolManager>
             Debug.Log("This ObjectPool has empty"); 
             return null; 
         }
-        if (ObjectPool[GUOType].Count == 0) return NewCreateGameObject(GUOType);
+        if (ObjectPool[GUOType].Count == 0) { return NewCreateGameObject(GUOType); }
 
         GameObject ptr;
-        ptr = ObjectPool[GUOType][0];
-        ObjectPool[GUOType].RemoveAt(0);
+        ptr = ObjectPool[GUOType][ObjectPool.Count - 1];
+        ObjectPool[GUOType].RemoveAt(ObjectPool.Count - 1);
         return ptr;
     }
 
@@ -74,6 +74,7 @@ public class GameObjectPoolManager : MonoSingleton<GameObjectPoolManager>
             for (int i = 0; i < ObjectPoolMax[GUOType]; i++)
             {
                 ptr = NewCreateGameObject(GUOType);
+                ObjectPool[GUOType].Add(ptr);
                 ptr.SetActive(false);
             }
             Debug.Log("Create ObjectPool: " + GUOType.ToString());
@@ -84,7 +85,6 @@ public class GameObjectPoolManager : MonoSingleton<GameObjectPoolManager>
     {
         GameObject ptr;
         ptr = Instantiate(ObjectPoolType[GUOType]);
-        if (ObjectPool[GUOType].Count > ObjectPoolMax[GUOType]) ObjectPool[GUOType].Add(ptr);
 
         return ptr;
     }

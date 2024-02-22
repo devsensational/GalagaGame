@@ -51,10 +51,18 @@ public class GamePlayerUnit : GameUnit, IGameUnitAttack, IGameUnitHit
         {
             bulletPtr = poolManager.OnGetGameObject(GameUnitObjectType.PLAYERBULLET);
             bulletPtr.transform.position = gameObject.transform.position;
-            bulletPtr.GetComponent<IGameBullet>().SetBulletParent(gameObject);
+            bulletPtr.GetComponent<GamePlayerBullet>().SetBulletParent(gameObject);
             bulletPtr.SetActive(true);
-            bulletPtr.GetComponent<IGameBullet>().ShootBullet(Vector3.up, GameUnitObjectType.PLAYERBULLET, "PlayerBullet");
+            bulletPtr.GetComponent<GamePlayerBullet>().ShootBullet(Vector3.up);
             BulletCount++;
+        }
+    }
+
+    public void SubUnitBulletCount()
+    {
+        if(BulletCount > 0)
+        {
+            BulletCount--;
         }
     }
 
