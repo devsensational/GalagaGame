@@ -10,8 +10,8 @@ public class GameEnemyUnitPlacementGrid : MonoBehaviour, IGameEnemyUnitPlacement
     public float        VerticalSpacing;
 
     //public
-    public byte[,] UnitPlacementGrid {  get; private set; }
-    public int     UnitCount         { get; set; }
+    public (byte, byte)[,]   UnitPlacementGrid {  get; private set; }
+    public int                  UnitCount         { get; set; }
 
     //private
     private GameEventManager    gameEventManager;
@@ -28,7 +28,16 @@ public class GameEnemyUnitPlacementGrid : MonoBehaviour, IGameEnemyUnitPlacement
         int row, col;
         CalculateUnitPosition(idx, out row, out col);
         UnitCount--;
-        UnitPlacementGrid[row, col] = 0;
+        UnitPlacementGrid[row, col].Item1 = 0;
+    }
+
+    public Vector3 UnitPosition(int idx)
+    {
+        int row, col;
+        CalculateUnitPosition(idx, out row, out col);
+        Vector3 newPosition = new Vector3(transform.position.x + (VerticalSpacing * col), transform.position.y - (HorizontalSpacing * row), transform.position.z);
+
+        return newPosition;
     }
 
     public void OnResetGrid()
@@ -40,15 +49,15 @@ public class GameEnemyUnitPlacementGrid : MonoBehaviour, IGameEnemyUnitPlacement
 
     private void CalculateUnitPosition(int idx, out int row, out int col)
     {
-        row = idx / width; col = idx % height;
+        row = idx / width; col = idx % width;
     }
 
     private void Init()
     {
         UnitPlacementGrid   = FileUtilityManager.Instance.CSVUtil.ReadCSV(UnitPlacementFile);
         gameEventManager    = GameEventManager.Instance;
-        width               = UnitPlacementGrid.GetLength(0);
-        height              = UnitPlacementGrid.GetLength(1);
+        width               = UnitPlacementGrid.GetLength(1);
+        height              = UnitPlacementGrid.GetLength(0);
 
         Debug.Log("GameEnemyUnitPlaceGird init complete");
     }
@@ -56,6 +65,7 @@ public class GameEnemyUnitPlacementGrid : MonoBehaviour, IGameEnemyUnitPlacement
     void Start()
     {
         Init();
+        Debug.Log("Width: " + width + " / height: " + height);
     }
 
     void Awake()

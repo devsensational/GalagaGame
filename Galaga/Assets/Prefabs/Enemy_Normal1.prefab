@@ -100,12 +100,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Hp: 1
-  moveSpeed: 1
+  moveSpeed: 500
   moveSpeedMultiplier: 1
   Score: 0
   PattenFile:
   - {fileID: 0}
-  Bullet: {fileID: 0}
+  Bullet: {fileID: 3835241906650147920, guid: c72c91a0aadc3e04fabba9c23f37ba04, type: 3}
 --- !u!61 &1361906404935126292
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -22,6 +22,9 @@ public class GameManager : MonoSingleton<GameManager>
     private GameEventManager        gameEventManager;
     private GameKeyManager          gameKeyManager;
     private GameObjectPoolManager   gamePoolManager;
+
+    private GameEnemyUnitController gameEnemyUnitController;
+
     private GameStatus              gameStatus;
 
     protected override void ChildAwake()

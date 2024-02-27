@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public enum EnemyUnitStatus : uint
 {
@@ -28,18 +29,21 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
     [SerializeField] private GameObject         Bullet;
 
     //public
-    public int UnitIndex        { get; set; }
-    public int EnemyUnitType    { get; set; }
+    public int              UnitIndex        { get; set; }
+    public int              UnitSeqeunceIdx  { get; set; }
+    public int              EnemyUnitType    { get; set; }
+    public Vector3          UnitPosition     { get; set; }
+    public List<Vector3>    ControlPoints    { get; set; }
 
     //private
     GameEnemyUnitController enemyUnitController;
     GameObjectPoolManager   objectPoolManager;
     GameManager             gameManager;    
     GameObject              playerUnit;
+    EnemyUnitStatus         enemyUnitStatus;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Enemy Unit hit from " + collision.gameObject);
         if (collision.gameObject.CompareTag("PlayerBullet"))
         {
             UnitHit();
@@ -56,13 +60,53 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
     }
     public void UnitAttack()
     {
-        
+        if(enemyUnitStatus == EnemyUnitStatus.MOVE)
+        {
+
+        }
     }
 
     public void UnitHit()
     {
         Hp -= 1;
         CheckUnitDead();
+    }
+
+    public void StartUnitMove(List<Vector3> ControlPoints)
+    {
+        Debug.Log("(GameEnemyUnit) Move Start: " + gameObject.name);
+        this.ControlPoints = ControlPoints;
+        this.ControlPoints.Add(UnitPosition);
+
+        transform.position = ControlPoints[0];
+        StartCoroutine(CalulatePath());
+    }
+
+    private IEnumerator CalulatePath()
+    {
+        float t = 0; // 베지에 곡선을 따라 이동하는 현재 위치의 매개변수
+
+        while (t < 1.0f)
+        {
+            t += 0.001f * moveSpeed * moveSpeedMultiplier * Time.deltaTime; // 시간에 따라 t를 증가시켜 베지에 곡선을 따라 이동
+
+            Vector3 currentPosition = CalculateBezierPoint(t, ControlPoints);
+            transform.position = currentPosition; // 오브젝트의 위치 업데이트
+
+            if (t < 1.0f)
+            {
+                Vector3 nextPosition = CalculateBezierPoint(Mathf.Min(t + 0.01f, 1.0f), ControlPoints);
+                Vector3 direction = (nextPosition - currentPosition).normalized; // 이동 방향 계산
+
+                /*if (direction != Vector3.zero)
+                {
+                    Quaternion targetRotation = Quaternion.LookRotation(direction);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5); // 부드럽게 회전
+                }*/
+            }
+
+            yield return null; // 다음 프레임까지 대기
+        }
     }
 
     private Vector3 AimPlayerUnit()
@@ -113,11 +157,12 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
         playerUnit          = GameObject.Find("SpaceShip");
         enemyUnitController = GameObject.Find("GameEnemyController").GetComponent<GameEnemyUnitController>();
         objectPoolManager   = GameObjectPoolManager.Instance;
+        gameManager         = GameManager.Instance;
     }
 
     void Update() 
     {
-        //AimPlayerUnit();
+
     }
 
 }

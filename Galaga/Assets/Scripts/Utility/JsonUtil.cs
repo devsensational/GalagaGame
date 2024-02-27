@@ -18,20 +18,28 @@ public class JsonUtil
         Debug.Log("Saved Json file to " + filePath);
     }
 
-    public T LoadBezierFile<T>()
-    {
+    public T LoadBezierFile<T>(TextAsset textAsset)
+    { 
         T objectPointer = default;
-        if (File.Exists(filePath))
-        {
-            string json = File.ReadAllText(filePath);
 
-            objectPointer = JsonConvert.DeserializeObject<T>(json);
-            Debug.Log("Loaded Json file from " + filePath);
+        if (textAsset != null)
+        {
+            try
+            {
+                string json = textAsset.text;
+                objectPointer = JsonConvert.DeserializeObject<T>(json);
+                Debug.Log("Loaded Json file from TextAsset");
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError("Error deserializing JSON from TextAsset: " + ex.Message);
+            }
         }
         else
         {
-            Debug.LogError("Cannot load Bezier file; file does not exist.");
+            Debug.LogError("Cannot load Bezier file; TextAsset is null.");
         }
+
         return objectPointer;
     }
 }
