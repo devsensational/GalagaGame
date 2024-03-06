@@ -23,6 +23,8 @@ public class GameEnemyUnitController : MonoBehaviour
     GameStatus                  status;
     GameEventManager            gameEventManager;
 
+    GamePathGenerator           gamePathGenerator;
+
     WaitForSeconds              enemyUnitAttackInterval;
     WaitForSeconds              enemyUnitMoveInterval;
 
@@ -41,7 +43,7 @@ public class GameEnemyUnitController : MonoBehaviour
         unitGridObject.OnResetGrid();
         unitGrid = unitGridObject.UnitPlacementGrid;
         CreateUnitFromGrid();
-        StartCoroutine(EnemyUnitFirstAttackCommand(0));
+        EnemyUnitFirstAttackCommand();
     }
 
     private void OnGameStart()
@@ -61,26 +63,24 @@ public class GameEnemyUnitController : MonoBehaviour
 
     }
 
-    private IEnumerator EnemyUnitFirstAttackCommand(int idx)
+    private void EnemyUnitFirstAttackCommand()
     {
-        yield return enemyUnitAttackInterval;
-        Debug.Log("(EnemyUnitFirstAttackCommand) idx: " + idx);
-        List<Vector3> pointers = CreatePathPointers(idx, StartPatternList);
-
-        foreach (GameObject ptr in enemyUnitList)
+        for (int idx = 0; idx < StartPatternList.Count; idx++)
         {
-            GameEnemyUnit unitPtr = ptr.GetComponent<GameEnemyUnit>();
-            Debug.Log("(EnemyUnitFirstAttackCommand) UnitSequence: " + unitPtr.UnitSeqeunceIdx);
-            if (unitPtr.UnitSeqeunceIdx == idx)
+            Debug.Log("(EnemyUnitFirstAttackCommand) idx: " + idx);
+            int unitCount = 0;
+
+            while (unitCount < enemyUnitList.Count)
             {
-                unitPtr.StartUnitMove(pointers);
+                GameEnemyUnit unitPtr = enemyUnitList[unitCount % enemyUnitList.Count].GetComponent<GameEnemyUnit>();
+                if (unitPtr != null && unitPtr.UnitSeqeunceIdx == idx)
+                {
+                    List<Vector3> pointers = gamePathGenerator.CalculateBezierPathPoints(50, CreatePathPointers(idx, StartPatternList, unitPtr.UnitPosition));
+                    unitPtr.StartUnitMove(pointers, EnemyUnitAttackIntervalTime * idx, EnemyUnitMoveIntervalTime * unitCount);
+                    Debug.Log("(EnemyUnitFirstAttackCommand) UnitSequence: " + unitPtr.UnitSeqeunceIdx);
+                }
+                unitCount++;
             }
-            yield return enemyUnitMoveInterval;
-        }
-
-        if(StartPatternList.Count <= idx)
-        {
-            StartCoroutine(EnemyUnitFirstAttackCommand(idx + 1));
         }
     }
 
@@ -89,7 +89,7 @@ public class GameEnemyUnitController : MonoBehaviour
 
     }
 
-    private List<Vector3> CreatePathPointers(int idx, List<TextAsset> textAssets)
+    private List<Vector3> CreatePathPointers(int idx, List<TextAsset> textAssets, Vector3 endPosition)
     {
         List<Vector3> pointers = new List<Vector3>();
         BezierObject bezierObject = FileUtilityManager.Instance.JsonUtil.LoadBezierFile<BezierObject>(textAssets[idx]);
@@ -100,6 +100,7 @@ public class GameEnemyUnitController : MonoBehaviour
         {
             pointers.Add(new Vector3(bezierObject.PointList[i][0], bezierObject.PointList[i][1], bezierObject.PointList[i][2]));
         }
+        pointers.Add(endPosition);
 
         return pointers;
     }
@@ -130,6 +131,7 @@ public class GameEnemyUnitController : MonoBehaviour
             unitStatusPtr.EnemyUnitType         = unit.Item1;
             unitStatusPtr.UnitSeqeunceIdx       = unit.Item2;
             unitStatusPtr.UnitPosition          = unitGridObject.UnitPosition(idx);
+            unitStatusPtr.name                  = "EnemyUnit " + idx;
         }
 
         unitGridObject.UnitCount = cnt;
@@ -152,6 +154,7 @@ public class GameEnemyUnitController : MonoBehaviour
         status                  = GameStatus.NONE;
         enemyUnitAttackInterval = new WaitForSeconds(EnemyUnitAttackIntervalTime);
         enemyUnitMoveInterval   = new WaitForSeconds(EnemyUnitMoveIntervalTime);
+        gamePathGenerator       = new GamePathGenerator();
 
         gameEventManager.AddEvent(GameStatus.GAMERESET,         OnGameReset);
         gameEventManager.AddEvent(GameStatus.GAMESTART,         OnGameStart);

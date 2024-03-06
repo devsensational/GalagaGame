@@ -43,6 +43,8 @@ public class GameEnemyUnitPlacementGrid : MonoBehaviour, IGameEnemyUnitPlacement
     public void OnResetGrid()
     {
         UnitPlacementGrid = FileUtilityManager.Instance.CSVUtil.ReadCSV(UnitPlacementFile);
+        width = UnitPlacementGrid.GetLength(1);
+        height = UnitPlacementGrid.GetLength(0);
         Debug.Log("GameEnemyUnitPlaceGird reset complete");
 
     }
@@ -54,10 +56,8 @@ public class GameEnemyUnitPlacementGrid : MonoBehaviour, IGameEnemyUnitPlacement
 
     private void Init()
     {
-        UnitPlacementGrid   = FileUtilityManager.Instance.CSVUtil.ReadCSV(UnitPlacementFile);
         gameEventManager    = GameEventManager.Instance;
-        width               = UnitPlacementGrid.GetLength(1);
-        height              = UnitPlacementGrid.GetLength(0);
+        OnResetGrid();
 
         Debug.Log("GameEnemyUnitPlaceGird init complete");
     }

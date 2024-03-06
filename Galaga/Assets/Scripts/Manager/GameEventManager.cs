@@ -34,8 +34,6 @@ public class GameEventManager : MonoSingleton<GameEventManager>
     public void AddEvent(GameStatus status, funcType1 func)
     {
         if (checkEventDictionaryIsNull()) return;
-
-        // 키가 존재하며 대리자가 아직 추가되지 않았는지 확인
         if (EventDictionary.ContainsKey(status))
         {
             if (EventDictionary[status] != null && !EventDictionary[status].GetInvocationList().Contains(func))

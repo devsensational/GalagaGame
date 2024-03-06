@@ -11,11 +11,15 @@ public class GameBullet : GameUnit, IGameBullet
     [Header ("Bullet Inspector")]
     public float destroyTime;
 
+    //public
+    public bool  IsHit {  get; set; }
+
     //protected
     protected Vector3               direction;
     protected GameObjectPoolManager poolManager;
     protected GameObject            BulletParent;
     protected GameUnitObjectType    type;
+
     //private
 
     public void ShootBullet(Vector3 direction)
@@ -38,6 +42,7 @@ public class GameBullet : GameUnit, IGameBullet
     {
         gameObject.transform.Translate(direction * moveSpeed * moveSpeedMultiplier * Time.deltaTime);
     }
+
     virtual public void DestroyBullet()
     {
         if (poolManager != null || gameObject.activeSelf == false)
@@ -58,6 +63,7 @@ public class GameBullet : GameUnit, IGameBullet
     public void Awake()
     {
         poolManager = GameObjectPoolManager.Instance;
+        IsHit       = false;
         ChildAwake();
     }
 

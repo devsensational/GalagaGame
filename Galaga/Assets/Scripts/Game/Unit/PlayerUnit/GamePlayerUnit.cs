@@ -52,6 +52,7 @@ public class GamePlayerUnit : GameUnit, IGameUnitAttack, IGameUnitHit
             bulletPtr = poolManager.OnGetGameObject(GameUnitObjectType.PLAYERBULLET);
             bulletPtr.transform.position = gameObject.transform.position;
             bulletPtr.GetComponent<GamePlayerBullet>().SetBulletParent(gameObject);
+            bulletPtr.GetComponent<GamePlayerBullet>().IsHit = false;
             bulletPtr.SetActive(true);
             bulletPtr.GetComponent<GamePlayerBullet>().ShootBullet(Vector3.up);
             BulletCount++;
