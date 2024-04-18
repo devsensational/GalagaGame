@@ -13,6 +13,8 @@ public class GameManager : MonoSingleton<GameManager>
     public List<GameObject>         EnemyUnitList;
     [SerializeField]
     private GameObject              EnemyUnitPlacementGrid;
+    [SerializeField]
+    float                           GameWaitTimeValue;
 
     //public
     public int Score        { get; private set; }
@@ -27,9 +29,12 @@ public class GameManager : MonoSingleton<GameManager>
 
     private GameStatus              gameStatus;
 
+    private WaitForSeconds          gameWaitTime;
+
     protected override void ChildAwake()
     {
         DontDestroyOnLoad(this.gameObject);
+        gameWaitTime = new WaitForSeconds(GameWaitTimeValue);
     }
 
     protected override void ChildOnDestroy()
@@ -61,6 +66,18 @@ public class GameManager : MonoSingleton<GameManager>
         gameEventManager.OnTriggerGameEvent(GameStatus.GAMERESET);
     }
 
+    private IEnumerator SwitchGameStart()
+    {
+        yield return gameWaitTime;
+        gameEventManager.OnTriggerGameEvent(GameStatus.GAMESTART);
+    }
+
+    private IEnumerator SwitchGameInProgress()
+    {
+        yield return gameWaitTime;
+        gameEventManager.OnTriggerGameEvent(GameStatus.GAMEINPROGRESS);
+    }
+
     public void OnAddScore(int score)
     {
         Score += score;
@@ -71,7 +88,7 @@ public class GameManager : MonoSingleton<GameManager>
         Debug.Log("Game restart from GameManager");
 
         gameStatus = GameStatus.GAMERESET;
-        gameEventManager.OnTriggerGameEvent(GameStatus.GAMESTART);
+        StartCoroutine(SwitchGameStart());
     }
 
     private void OnGameStart()
@@ -82,7 +99,7 @@ public class GameManager : MonoSingleton<GameManager>
         GameObject ptr = Instantiate(PlayerUnit);
         ptr.name = "SpaceShip";
 
-        gameEventManager.OnTriggerGameEvent(GameStatus.GAMEINPROGRESS);
+        StartCoroutine(SwitchGameInProgress());
     }
 
     private void OnGameProgress()

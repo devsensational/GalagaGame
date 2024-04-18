@@ -24,12 +24,15 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 {
     //Inspector Field
     [Header("Enemy Unit Inspector")]
-    [SerializeField] private int                Score;
-    [SerializeField] private List<TextAsset>    PattenFile;
+    [SerializeField] public  List<TextAsset>     PattenFile;
     [SerializeField] private GameObject         Bullet;
+    [SerializeField] private int                Score;
+
+    [Header("Sprite")]
     [SerializeField] private List<Sprite>       SpriteList;
     [SerializeField] private int                SpriteChangeTime;
-    [SerializeField] private float              rotationResetSpeed = 1f;
+    [SerializeField] private float              RotationResetValue;
+    [SerializeField] private float              RotationResetSpeed;
 
     //public
     public int              UnitIndex        { get; set; }
@@ -39,19 +42,23 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
     public List<Vector3>    ControlPoints    { get; set; }
 
     //private
-    GameEnemyUnitController enemyUnitController;
-    GameObjectPoolManager   objectPoolManager;
-    GameManager             gameManager;    
-    GameObject              playerUnit;
-    EnemyUnitStatus         enemyUnitStatus;
+    private GameEnemyUnitController enemyUnitController;
+    private GameObjectPoolManager   objectPoolManager;
+    private GameManager             gameManager;    
+    private GameObject              playerUnit;
+    private GameObject              resetPosition;
+    private EnemyUnitStatus         enemyUnitStatus;
 
-    WaitForSeconds          unitFirstMoveInterval;
+    private WaitForSeconds          unitFirstMoveInterval;
+    private WaitForSeconds          rotationResetSpeedInterval;
 
-    SpriteRenderer          spriteRenderer;
-    WaitForSeconds          spriteChangeWaitForSeconds;
+    private SpriteRenderer          spriteRenderer;
+    private WaitForSeconds          spriteChangeWaitForSeconds;
 
-    int                     spriteIdx = 0;
-    int                     currentPointIndex = 0;
+    private Coroutine               moveCoroutine;
+
+    private int                     spriteIdx = 0;
+    private int                     currentPointIndex = 0;
 
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -71,10 +78,13 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
         }
         if (collision.gameObject.CompareTag("Outside"))
         {
-
+            StopCoroutine(moveCoroutine);
+            UnitResetPosition();
         }
 
     }
+
+
     public void UnitAttack()
     {
         if(enemyUnitStatus == EnemyUnitStatus.MOVE)
@@ -86,18 +96,25 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
     public void UnitHit()
     {
         Hp -= 1;
+        if(enemyUnitStatus == EnemyUnitStatus.MOVE) enemyUnitController.EnemyUnitArrived();
         CheckUnitDead();
     }
 
-    public void StartUnitMove(List<Vector3> ControlPoints, float unitAttackIntervalTime, float unitMoveIntervalTime)
+    public void StartUnitMove(List<Vector3> ControlPoints, float unitMoveIntervalTime)
     {
         Debug.Log("(GameEnemyUnit) Move Start: " + gameObject.name);
         this.ControlPoints = ControlPoints;
+        enemyUnitStatus = EnemyUnitStatus.MOVE;
         //this.ControlPoints.Add(UnitPosition);
 
         transform.position = ControlPoints[0];
-        unitFirstMoveInterval = new WaitForSeconds(unitAttackIntervalTime + unitMoveIntervalTime);
-        StartCoroutine(UnitMove(unitFirstMoveInterval));
+        unitFirstMoveInterval = new WaitForSeconds(unitMoveIntervalTime);
+        moveCoroutine = StartCoroutine(UnitMove(unitFirstMoveInterval));
+    }
+
+    public void StartUnitAttack()
+    {
+
     }
 
     private IEnumerator UnitMove(WaitForSeconds intervalTime)
@@ -105,55 +122,71 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
         yield return intervalTime;
         while (FollowPath()) { yield return null; }
         Debug.Log("UnitMoveComplete");
+        enemyUnitStatus = EnemyUnitStatus.DEFAULT;
+        enemyUnitController.EnemyUnitArrived();
         StartCoroutine(ResetRotationCoroutine());
     }
 
     private bool FollowPath()
     {
-        if (ControlPoints.Count == 0) return false; // 경로에 점이 없으면 함수 종료
+        if (ControlPoints.Count == 0) return false;
 
-        // 현재 위치에서 다음 컨트롤 포인트까지의 거리 계산
-        float   step = moveSpeed * moveSpeedMultiplier * Time.deltaTime;
+        float step = moveSpeed * moveSpeedMultiplier * Time.deltaTime;
 
         transform.position = Vector3.MoveTowards(transform.position, ControlPoints[currentPointIndex], step);
 
-        // 회전 처리 - 목적지 방향으로 오브젝트 회전
         Vector3 targetDirection = ControlPoints[currentPointIndex] - transform.position;
         if (targetDirection != Vector3.zero)
         {
             float angle = Mathf.Atan2(targetDirection.y, targetDirection.x) * Mathf.Rad2Deg;
-            // '머리'가 기본적으로 12시 방향을 가리키도록 설정, 그래서 여기서는 각도에 변화를 주지 않습니다.
-            transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle - 90)); // -90을 더해 스프라이트가 이동 방향을 가리키도록 조정
+            transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle - 90));
         }
 
-
-        // 현재 점에 도착했는지 확인
-        if (Vector3.Distance(transform.position, ControlPoints[currentPointIndex]) < 0.1f)
+        if (Vector3.Distance(transform.position, ControlPoints[currentPointIndex]) < 0.001f)
         {
-            currentPointIndex++; // 다음 점으로 인덱스 이동
+            currentPointIndex++;
             if (currentPointIndex >= ControlPoints.Count)
             {
-                currentPointIndex = 0; // 리스트 끝에 도달하면 처음으로 돌아감
+                currentPointIndex = 0;
                 return false;
             }
         }
         return true;
     }
 
+    private void UnitResetPosition()
+    {
+        transform.position = resetPosition.transform.position;
+        List<Vector3> points = new List<Vector3>();
+        points.Add(transform.position);
+        points.Add(UnitPosition);
+        currentPointIndex = 0;
+        StartUnitMove(points, 0f);
+        enemyUnitController.AddEnemyUnitList(gameObject);
+    }
+
     IEnumerator ResetRotationCoroutine()
     {
-        Quaternion startRotation = transform.rotation; // 현재 회전 상태를 저장
-        Quaternion endRotation = Quaternion.Euler(0, 0, 0); // 목표 회전 상태 (0, 0, 0)
-        float time = 0;
-
-        while (time < 1)
+        while (true)
         {
-            transform.rotation = Quaternion.Lerp(startRotation, endRotation, time);
-            time += Time.deltaTime * rotationResetSpeed; // 이 값을 조정하여 회전 속도를 변경
-            yield return null; // 다음 프레임까지 기다림
-        }
+            float currentRotation = transform.eulerAngles.z;
 
-        transform.rotation = endRotation; // 정확한 위치에 확실히 고정
+            if (currentRotation > 180)
+            {
+                currentRotation -= 360;
+            }
+
+            if (Mathf.Abs(currentRotation) <= RotationResetValue)
+            {
+                transform.eulerAngles = Vector3.zero;
+                yield break; 
+            }
+
+            float rotationStep = currentRotation > 0 ? -RotationResetValue : RotationResetValue;
+            transform.Rotate(0, 0, rotationStep);
+
+            yield return rotationResetSpeedInterval;
+        }
     }
 
     private Vector3 AimPlayerUnit()
@@ -170,6 +203,16 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
             gameManager.OnAddScore(Score);
             enemyUnitController.RemoveUnit(UnitIndex, gameObject);
         }
+    }
+
+    private void CheckUnitArrive()
+    {
+        
+    }
+
+    private void OnGameInProgress()
+    {
+        resetPosition = GameObject.Find("EnemyTeleportLocation");
     }
 
     virtual protected IEnumerator OnAnimationSwitch()
@@ -192,6 +235,9 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
         gameManager                 = GameManager.Instance;
         spriteRenderer              = gameObject.GetComponent<SpriteRenderer>();
         spriteChangeWaitForSeconds  = new WaitForSeconds(SpriteChangeTime);
+        rotationResetSpeedInterval  = new WaitForSeconds(RotationResetSpeed);
+
+        GameEventManager.Instance.AddEvent(GameStatus.GAMEINPROGRESS, OnGameInProgress);
     }
 
     void Start()
@@ -204,6 +250,8 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 
     }
 
+    virtual protected void ChildAwake() { }
+
     private void OnEnable()
     {
         StartCoroutine(OnAnimationSwitch());
@@ -212,16 +260,14 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
     void OnDrawGizmosSelected()
     {
         Vector3 size = new Vector3(0.1f, 0.1f, 0.1f);
-        if (ControlPoints.Count > 1) // 두 개 이상의 포인트가 필요
+        if (ControlPoints.Count > 1) 
         {
-            Gizmos.color = Color.red; // Gizmo 색상 설정
+            Gizmos.color = Color.red;
             for (int i = 0; i < ControlPoints.Count - 1; i++)
             {
-                // 현재 점에서 다음 점까지 라인을 그립니다.
                 Gizmos.DrawLine(ControlPoints[i], ControlPoints[i + 1]);
                 Gizmos.DrawCube(ControlPoints[i], size);
             }
         }
     }
-
 }

@@ -1,5 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
+using System.Runtime.CompilerServices;
+using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameEnemyUnitController : MonoBehaviour
@@ -10,25 +15,31 @@ public class GameEnemyUnitController : MonoBehaviour
     [SerializeField]
     List<TextAsset>             PatternList;
     [SerializeField]
-    float                       EnemyUnitAttackIntervalTime;
+    private int                 NumberOfAttackEnemyUnit;
     [SerializeField]
-    float                       EnemyUnitMoveIntervalTime;
+    private float               EnemyUnitMoveIntervalTime;
 
     //private
-    List<GameObject>            enemyUnitTypeList;
-    List<GameObject>            enemyUnitList;
+    private List<GameObject>            enemyUnitTypeList;
+    private List<GameObject>            enemyUnitList;
+    private List<List<GameObject>>      enemyUnitSequence;
 
-    GameEnemyUnitPlacementGrid  unitGridObject;
-    GameManager                 gameManager;
-    GameStatus                  status;
-    GameEventManager            gameEventManager;
+    private GameEnemyUnitPlacementGrid  unitGridObject;
+    private GameManager                 gameManager;
+    private GameStatus                  status;
+    private GameEventManager            gameEventManager;
+    private GameObject                  gamePlayerUnit;
 
-    GamePathGenerator           gamePathGenerator;
+    private GamePathGenerator           gamePathGenerator;
 
-    WaitForSeconds              enemyUnitAttackInterval;
-    WaitForSeconds              enemyUnitMoveInterval;
+    private WaitForSeconds              enemyUnitAttackInterval;
+    private WaitForSeconds              enemyUnitMoveInterval;
 
-    (byte, byte)[,]             unitGrid;
+    private (byte, byte)[,]             unitGrid;
+
+    private int                         unitMoveCount;
+    private int                         unitSequenceIdx;
+
 
     private void OnGameReset()
     {
@@ -40,10 +51,10 @@ public class GameEnemyUnitController : MonoBehaviour
         }
 
         enemyUnitList.Clear();
+        enemyUnitSequence.Clear();
         unitGridObject.OnResetGrid();
         unitGrid = unitGridObject.UnitPlacementGrid;
         CreateUnitFromGrid();
-        EnemyUnitFirstAttackCommand();
     }
 
     private void OnGameStart()
@@ -55,7 +66,9 @@ public class GameEnemyUnitController : MonoBehaviour
     private void OnGameInProgress()
     {
         status = GameStatus.GAMEINPROGRESS;
+        gamePlayerUnit = GameObject.Find("SpaceShip");
         Debug.Log("(EnemyUnitController) GameInProgress");
+        EnemyUnitFirstAttackCommand();
     }
 
     private void OnGamePause()
@@ -65,28 +78,62 @@ public class GameEnemyUnitController : MonoBehaviour
 
     private void EnemyUnitFirstAttackCommand()
     {
-        for (int idx = 0; idx < StartPatternList.Count; idx++)
+        unitMoveCount = enemyUnitSequence[unitSequenceIdx].Count;
+        for(int i = 0; i < enemyUnitSequence[unitSequenceIdx].Count; i++)
         {
-            Debug.Log("(EnemyUnitFirstAttackCommand) idx: " + idx);
-            int unitCount = 0;
-
-            while (unitCount < enemyUnitList.Count)
-            {
-                GameEnemyUnit unitPtr = enemyUnitList[unitCount % enemyUnitList.Count].GetComponent<GameEnemyUnit>();
-                if (unitPtr != null && unitPtr.UnitSeqeunceIdx == idx)
-                {
-                    List<Vector3> pointers = gamePathGenerator.CalculateBezierPathPoints(50, CreatePathPointers(idx, StartPatternList, unitPtr.UnitPosition));
-                    unitPtr.StartUnitMove(pointers, EnemyUnitAttackIntervalTime * idx, EnemyUnitMoveIntervalTime * unitCount);
-                    Debug.Log("(EnemyUnitFirstAttackCommand) UnitSequence: " + unitPtr.UnitSeqeunceIdx);
-                }
-                unitCount++;
+            Debug.Log("(EnemyUnitFirstAttackCommand) idx: " + i);
+            GameEnemyUnit unitPtr = enemyUnitSequence[unitSequenceIdx][i].GetComponent<GameEnemyUnit>();
+            if (unitPtr != null)
+            { 
+                List<Vector3> pointers = gamePathGenerator.CalculateBezierPathPoints(30, CreatePathPointers(unitSequenceIdx, StartPatternList, unitPtr.UnitPosition));
+                unitPtr.StartUnitMove(pointers, EnemyUnitMoveIntervalTime * i);
             }
         }
     }
 
     private void EnemyUnitAttackCommand()
     {
+        int NumberOfAttackEnemyUnit = this.NumberOfAttackEnemyUnit <= enemyUnitList.Count ? this.NumberOfAttackEnemyUnit : enemyUnitList.Count;
+        unitMoveCount = NumberOfAttackEnemyUnit;
+        for(int i = 0; i < NumberOfAttackEnemyUnit; i++)
+        {
+            int randomIdx = UnityEngine.Random.Range(0, enemyUnitList.Count);
+            GameEnemyUnit unitPtr = enemyUnitList[randomIdx].GetComponent<GameEnemyUnit>();
+            if(unitPtr != null)
+            {
+                Vector3 tempUnitPos = gamePlayerUnit.transform.position;
+                tempUnitPos.y = tempUnitPos.y - 2f;
+                List<Vector3> pointers = gamePathGenerator.CalculateBezierPathPoints(30, CreatePathPointers(0, unitPtr.PattenFile, unitPtr.UnitPosition, tempUnitPos));
+                unitPtr.StartUnitMove(pointers, EnemyUnitMoveIntervalTime * i);
+                unitPtr.StartUnitAttack();
+            }
+            enemyUnitList.RemoveAt(randomIdx);
+        }
+    }
 
+    public void AddEnemyUnitList(GameObject gObject)
+    {
+        enemyUnitList.Add(gObject);
+    }
+
+    public bool EnemyUnitArrived()
+    {
+        unitMoveCount--;
+        if(unitMoveCount == 0) 
+        {
+            if(unitSequenceIdx < enemyUnitSequence.Count - 1)
+            {
+                unitSequenceIdx++;
+                Debug.Log("(EnemyUnitController) unitSequenceIdx = " + unitSequenceIdx);
+                EnemyUnitFirstAttackCommand();
+            }
+            else if(enemyUnitList.Count > 0)
+            {
+                EnemyUnitAttackCommand();
+            }
+            return true;
+        }
+        return false;
     }
 
     private List<Vector3> CreatePathPointers(int idx, List<TextAsset> textAssets, Vector3 endPosition)
@@ -96,6 +143,22 @@ public class GameEnemyUnitController : MonoBehaviour
 
 
         pointers.Add(new Vector3(bezierObject.StartPosition[0], bezierObject.StartPosition[1], bezierObject.StartPosition[2]));
+        for (int i = 0; i < bezierObject.PointList.Count; i++)
+        {
+            pointers.Add(new Vector3(bezierObject.PointList[i][0], bezierObject.PointList[i][1], bezierObject.PointList[i][2]));
+        }
+        pointers.Add(endPosition);
+
+        return pointers;
+    }
+
+    private List<Vector3> CreatePathPointers(int idx, List<TextAsset> textAssets, Vector3 StartPosition, Vector3 endPosition)
+    {
+        List<Vector3> pointers = new List<Vector3>();
+        BezierObject bezierObject = FileUtilityManager.Instance.JsonUtil.LoadBezierFile<BezierObject>(textAssets[idx]);
+
+
+        pointers.Add(StartPosition);
         for (int i = 0; i < bezierObject.PointList.Count; i++)
         {
             pointers.Add(new Vector3(bezierObject.PointList[i][0], bezierObject.PointList[i][1], bezierObject.PointList[i][2]));
@@ -124,6 +187,8 @@ public class GameEnemyUnitController : MonoBehaviour
             unitStatusPtr = ptr.GetComponent<GameEnemyUnit>();
             
             enemyUnitList.Add(ptr);
+            while(enemyUnitSequence.Count <= unit.Item2) { enemyUnitSequence.Add(new List<GameObject>()); }
+            enemyUnitSequence[unit.Item2].Add(ptr);
             cnt++;
 
             //생성된 EnemyUnit에 대한 상태를 해당 주석 아래에 서술해야 함
@@ -142,6 +207,10 @@ public class GameEnemyUnitController : MonoBehaviour
         unitGridObject.UnitRemoveAt(idx);
         enemyUnitList.Remove(ptr);
         Destroy(ptr);
+        if(enemyUnitList.Count == 0)
+        {
+            gameEventManager.OnTriggerGameEvent(GameStatus.STAGECLEAR);
+        }
     }
 
     private void Init()
@@ -151,10 +220,11 @@ public class GameEnemyUnitController : MonoBehaviour
         gameManager             = GameManager.Instance;
         enemyUnitTypeList       = gameManager.EnemyUnitList;
         enemyUnitList           = new List<GameObject>();
+        enemyUnitSequence       = new List<List<GameObject>>();
         status                  = GameStatus.NONE;
-        enemyUnitAttackInterval = new WaitForSeconds(EnemyUnitAttackIntervalTime);
         enemyUnitMoveInterval   = new WaitForSeconds(EnemyUnitMoveIntervalTime);
         gamePathGenerator       = new GamePathGenerator();
+        unitSequenceIdx         = 0;
 
         gameEventManager.AddEvent(GameStatus.GAMERESET,         OnGameReset);
         gameEventManager.AddEvent(GameStatus.GAMESTART,         OnGameStart);

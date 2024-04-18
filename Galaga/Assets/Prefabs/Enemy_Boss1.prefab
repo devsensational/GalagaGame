@@ -102,13 +102,16 @@ MonoBehaviour:
   Hp: 1
   moveSpeed: 5
   moveSpeedMultiplier: 1
-  Score: 100
-  PattenFile: []
+  PattenFile:
+  - {fileID: 4900000, guid: 1c1cc8540d136ac48aff3c0c947c0a57, type: 3}
   Bullet: {fileID: 3835241906650147920, guid: c72c91a0aadc3e04fabba9c23f37ba04, type: 3}
+  Score: 100
   SpriteList:
   - {fileID: 21300000, guid: c717a297ee549f141af07f4d4c198996, type: 3}
   - {fileID: 21300000, guid: 003e0f1079847364bacb7de3ea18fa25, type: 3}
   SpriteChangeTime: 1
+  RotationResetValue: 15
+  RotationResetSpeed: 0.1
 --- !u!50 &5139189093297872266
 Rigidbody2D:
   serializedVersion: 4

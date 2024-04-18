@@ -907,6 +907,7 @@ MonoBehaviour:
   - {fileID: 391394202252277333, guid: efd28a7a47f29014586a7b4fc47ca866, type: 3}
   - {fileID: 7018870747634833461, guid: 1db677e5f237e6b4bb040560fd45f4c6, type: 3}
   EnemyUnitPlacementGrid: {fileID: 2081476821}
+  GameWaitTimeValue: 3
 --- !u!114 &1344589735
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1361,7 +1362,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6e7169c500bd444989387a4b727e352, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  UnitPlacementFile: {fileID: 4900000, guid: 70046df517264fb4a954e48dedf1cf1f, type: 3}
+  UnitPlacementFile: {fileID: 4900000, guid: e817e2c4ca9d88746b91b0808c8c263c, type: 3}
   HorizontalSpacing: 0.5
   VerticalSpacing: 0.5
 --- !u!4 &2081476823
@@ -1373,7 +1374,7 @@ Transform:
   m_GameObject: {fileID: 2081476821}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3, y: 2.96, z: 0}
+  m_LocalPosition: {x: -2, y: 4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1392,10 +1393,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   StartPatternList:
+  - {fileID: 4900000, guid: 30795475771f4d34daa9824b0295b472, type: 3}
   - {fileID: 4900000, guid: 1413c0f7a7ca00b498ef70b3ded89399, type: 3}
-  - {fileID: 4900000, guid: da16d24a760aa1942b71e413106e8ec9, type: 3}
+  - {fileID: 4900000, guid: 5a745f56d9e11d949b69a11feb0645f8, type: 3}
+  - {fileID: 4900000, guid: 30795475771f4d34daa9824b0295b472, type: 3}
+  - {fileID: 4900000, guid: 44c7898ef20497c48a7f110283524a5e, type: 3}
   PatternList: []
-  EnemyUnitAttackIntervalTime: 3
+  NumberOfAttackEnemyUnit: 4
   EnemyUnitMoveIntervalTime: 0.1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

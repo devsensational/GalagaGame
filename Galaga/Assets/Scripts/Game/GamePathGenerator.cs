@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GamePathGenerator
 {
-    public List<Vector3> CalculateBezierPathPoints(int pointCount, List<Vector3> controlPoints, float threshold = 0.8f)
+    public List<Vector3> CalculateBezierPathPoints(int pointCount, List<Vector3> controlPoints, float threshold = 0.9f)
     {
         List<Vector3> pathPoints = new List<Vector3>();
         float step = 1.0f / (pointCount - 1); // 점들 사이의 간격
