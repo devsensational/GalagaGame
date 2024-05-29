@@ -98,7 +98,7 @@ public class GamePlayerUnit : GameUnit, IGameUnitAttack, IGameUnitHit
         poolManager         = GameObjectPoolManager.Instance;
         gameEventManager    = GameEventManager.Instance;
 
-        poolManager.CreateGameObjectPool(GameUnitObjectType.PLAYERBULLET, Bullet, 3);
+        poolManager.CreateGameObjectPool(GameUnitObjectType.PLAYERBULLET, Bullet, 10);
 
         gameEventManager.AddEvent(GameStatus.PLAYERDEAD, OnUnitDead);
         Debug.Log("Unit init complete");

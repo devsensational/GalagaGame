@@ -7,18 +7,16 @@ using UnityEngine.Pool;
 public class GameManager : MonoSingleton<GameManager>
 {
     //Inspector
-    [SerializeField] 
-    private GameObject              PlayerUnit;
-    [SerializeField]
-    public List<GameObject>         EnemyUnitList;
-    [SerializeField]
-    private GameObject              EnemyUnitPlacementGrid;
-    [SerializeField]
-    float                           GameWaitTimeValue;
+    [SerializeField] private GameObject              PlayerUnit;
+    [SerializeField] public  List<GameObject>         EnemyUnitList;
+    [SerializeField] private GameObject              EnemyUnitPlacementGrid;
+    [SerializeField] private float                   GameWaitTimeValue;
+    [SerializeField] private int                     FirstPlayerLife;
 
     //public
     public int Score        { get; private set; }
     public int StageLevel   { get; set; }
+    public int PlayerLife   { get; set; }
 
     //private
     private GameEventManager        gameEventManager;
@@ -30,6 +28,11 @@ public class GameManager : MonoSingleton<GameManager>
     private GameStatus              gameStatus;
 
     private WaitForSeconds          gameWaitTime;
+
+    //UI
+    private GameObject ScoreValueUI;
+    private GameObject StageValueUI;
+    private GameObject PlayerLifeValueUI;
 
     protected override void ChildAwake()
     {
@@ -59,6 +62,8 @@ public class GameManager : MonoSingleton<GameManager>
         gameEventManager.AddEvent(GameStatus.GAMESTART,         OnGameStart);
         gameEventManager.AddEvent(GameStatus.GAMERESET,         OnGameReset);
         gameEventManager.AddEvent(GameStatus.GAMEINPROGRESS,    OnGameProgress);
+        gameEventManager.AddEvent(GameStatus.STAGECLEAR,        OnStageClear);
+
     }
 
     public void StartGameFirst()
@@ -78,9 +83,16 @@ public class GameManager : MonoSingleton<GameManager>
         gameEventManager.OnTriggerGameEvent(GameStatus.GAMEINPROGRESS);
     }
 
+    private IEnumerator SwitchGameNextLevel()
+    {
+        yield return gameWaitTime;
+        gameEventManager.OnTriggerGameEvent(GameStatus.GAMERESET);
+    }
+
     public void OnAddScore(int score)
     {
         Score += score;
+        ScoreValueUI.GetComponent<GameUIScore>().OnUpdateScore(Score);
     }
 
     private void OnGameReset()
@@ -88,6 +100,11 @@ public class GameManager : MonoSingleton<GameManager>
         Debug.Log("Game restart from GameManager");
 
         gameStatus = GameStatus.GAMERESET;
+
+        ScoreValueUI = GameObject.Find("ScoreValue");
+        StageValueUI = GameObject.Find("StageValue");
+        PlayerLifeValueUI = GameObject.Find("LifeValue");
+
         StartCoroutine(SwitchGameStart());
     }
 
@@ -97,9 +114,17 @@ public class GameManager : MonoSingleton<GameManager>
 
         gameStatus = GameStatus.GAMESTART;
         GameObject ptr = Instantiate(PlayerUnit);
+        StageValueUI.GetComponent<GameUIStageValue>().OnUpdateStageValue(++StageLevel);
         ptr.name = "SpaceShip";
 
         StartCoroutine(SwitchGameInProgress());
+    }
+
+    private void OnStageClear()
+    {
+        Debug.Log("Game Stage Clear");
+        StageLevel += 1;
+        StartCoroutine(SwitchGameNextLevel());
     }
 
     private void OnGameProgress()

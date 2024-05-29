@@ -34,7 +34,7 @@ public class GameObjectPoolManager : MonoSingleton<GameObjectPoolManager>
             Debug.Log("This ObjectPool has empty"); 
             return null; 
         }
-        if (ObjectPool[GUOType].Count == 0) { return NewCreateGameObject(GUOType); }
+        if (ObjectPool[GUOType].Count <= 0) { return NewCreateGameObject(GUOType); }
 
         GameObject ptr;
         ptr = ObjectPool[GUOType][ObjectPool.Count - 1];

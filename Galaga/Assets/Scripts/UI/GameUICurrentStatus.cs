@@ -14,6 +14,7 @@ public class GameUICurrentStatus : MonoBehaviour
         gameEventManager.AddEvent(GameStatus.GAMESTART, OnGameStart);
         gameEventManager.AddEvent(GameStatus.GAMERESET, OnGameReset);
         gameEventManager.AddEvent(GameStatus.GAMEINPROGRESS, OnGameInProgress);
+        gameEventManager.AddEvent(GameStatus.STAGECLEAR, OnGameStageClear);
         text = GetComponent<TextMeshProUGUI>();
     }
 
@@ -30,6 +31,11 @@ public class GameUICurrentStatus : MonoBehaviour
     private void OnGameInProgress()
     {
         text.text = "";
+
+    }
+    private void OnGameStageClear()
+    {
+        text.text = "STAGE CLEAR ! !";
 
     }
 }

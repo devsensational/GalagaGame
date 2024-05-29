@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -24,15 +25,18 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 {
     //Inspector Field
     [Header("Enemy Unit Inspector")]
-    [SerializeField] public  List<TextAsset>     PattenFile;
+    [SerializeField] public  List<TextAsset>    PattenFile;
     [SerializeField] private GameObject         Bullet;
+    [SerializeField] private GameObject         PlayerUnit;
     [SerializeField] private int                Score;
+    [SerializeField] private float              AttackTime;
 
+    //Sprite Inspector
     [Header("Sprite")]
-    [SerializeField] private List<Sprite>       SpriteList;
-    [SerializeField] private int                SpriteChangeTime;
-    [SerializeField] private float              RotationResetValue;
-    [SerializeField] private float              RotationResetSpeed;
+    [SerializeField] protected  List<Sprite>       SpriteList;
+    [SerializeField] private    int                SpriteChangeTime;
+    [SerializeField] private    float              RotationResetValue;
+    [SerializeField] private    float              RotationResetSpeed;
 
     //public
     public int              UnitIndex        { get; set; }
@@ -41,36 +45,41 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
     public Vector3          UnitPosition     { get; set; }
     public List<Vector3>    ControlPoints    { get; set; }
 
+    //protected
+    protected Coroutine                 moveCoroutine;
+    protected EnemyUnitStatus           enemyUnitStatus;
+    protected GameEnemyUnitController   enemyUnitController;
+    protected SpriteRenderer            spriteRenderer;
+    protected WaitForSeconds            spriteChangeWaitForSeconds;
+
+    protected int                      spriteIdx = 0;
+    protected int                      currentPointIndex = 0;
+
     //private
-    private GameEnemyUnitController enemyUnitController;
-    private GameObjectPoolManager   objectPoolManager;
+    private GameObjectPoolManager   poolManager;
     private GameManager             gameManager;    
-    private GameObject              playerUnit;
     private GameObject              resetPosition;
-    private EnemyUnitStatus         enemyUnitStatus;
+    private GameObject              bulletPtr;
 
     private WaitForSeconds          unitFirstMoveInterval;
     private WaitForSeconds          rotationResetSpeedInterval;
-
-    private SpriteRenderer          spriteRenderer;
-    private WaitForSeconds          spriteChangeWaitForSeconds;
-
-    private Coroutine               moveCoroutine;
-
-    private int                     spriteIdx = 0;
-    private int                     currentPointIndex = 0;
+    private WaitForSeconds          unitAttackTime;
 
 
-    private void OnTriggerEnter2D(Collider2D collision)
+
+    protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("PlayerBullet"))
         {
+            /*
             if(!collision.gameObject.GetComponent<GameBullet>().IsHit)
             {
-                collision.gameObject.GetComponent<GameBullet>().IsHit = true;
-                StopAllCoroutines();
-                UnitHit();
+                 collision.gameObject.GetComponent<GameBullet>().IsHit = true;
+                 StopAllCoroutines();
+                 UnitHit();
             }
+            */
+            UnitHit();
         }
         if (collision.gameObject.CompareTag("PlayerUnit"))
         {
@@ -84,19 +93,9 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 
     }
 
-
-    public void UnitAttack()
-    {
-        if(enemyUnitStatus == EnemyUnitStatus.MOVE)
-        {
-
-        }
-    }
-
-    public void UnitHit()
+    public virtual void UnitHit()
     {
         Hp -= 1;
-        if(enemyUnitStatus == EnemyUnitStatus.MOVE) enemyUnitController.EnemyUnitArrived();
         CheckUnitDead();
     }
 
@@ -112,9 +111,22 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
         moveCoroutine = StartCoroutine(UnitMove(unitFirstMoveInterval));
     }
 
-    public void StartUnitAttack()
+    public void UnitAttack()
     {
+        StartCoroutine(FireBullet());
+    }
 
+    private IEnumerator FireBullet()
+    {
+        yield return unitAttackTime;
+        Vector3 attackDirection = AimPlayerUnit();
+
+        bulletPtr = poolManager.OnGetGameObject(GameUnitObjectType.ENEMYBULLET);
+        bulletPtr.transform.position = gameObject.transform.position;
+        bulletPtr.GetComponent<GameEnemyBullet>().SetBulletParent(gameObject);
+        bulletPtr.GetComponent<GameEnemyBullet>().IsHit = false;
+        bulletPtr.SetActive(true);
+        bulletPtr.GetComponent<GameEnemyBullet>().ShootBullet(attackDirection);
     }
 
     private IEnumerator UnitMove(WaitForSeconds intervalTime)
@@ -154,7 +166,7 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
         return true;
     }
 
-    private void UnitResetPosition()
+    protected void UnitResetPosition()
     {
         transform.position = resetPosition.transform.position;
         List<Vector3> points = new List<Vector3>();
@@ -191,8 +203,8 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 
     private Vector3 AimPlayerUnit()
     {
-        if (playerUnit != null) { return Vector3.zero; }
-        Vector3 direction = gameObject.transform.position - playerUnit.transform.position;
+        if (PlayerUnit == null) { return Vector3.zero; }
+        Vector3 direction = gameObject.transform.position - PlayerUnit.transform.position;
         return direction.normalized;
     }
 
@@ -200,8 +212,10 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
     {
         if (Hp <= 0)
         {
+            if (enemyUnitStatus == EnemyUnitStatus.MOVE) enemyUnitController.EnemyUnitArrived();
             gameManager.OnAddScore(Score);
             enemyUnitController.RemoveUnit(UnitIndex, gameObject);
+
         }
     }
 
@@ -213,9 +227,10 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
     private void OnGameInProgress()
     {
         resetPosition = GameObject.Find("EnemyTeleportLocation");
+        PlayerUnit    = GameObject.Find("SpaceShip");
     }
 
-    virtual protected IEnumerator OnAnimationSwitch()
+    protected virtual IEnumerator OnAnimationSwitch()
     {
         if(SpriteList == null)
         {
@@ -229,20 +244,20 @@ public class GameEnemyUnit : GameUnit, IGameUnitAttack, IGameUnitHit
 
     void Awake() 
     {
-        playerUnit                  = GameObject.Find("SpaceShip");
         enemyUnitController         = GameObject.Find("GameEnemyController").GetComponent<GameEnemyUnitController>();
-        objectPoolManager           = GameObjectPoolManager.Instance;
+        poolManager                 = GameObjectPoolManager.Instance;
         gameManager                 = GameManager.Instance;
         spriteRenderer              = gameObject.GetComponent<SpriteRenderer>();
         spriteChangeWaitForSeconds  = new WaitForSeconds(SpriteChangeTime);
         rotationResetSpeedInterval  = new WaitForSeconds(RotationResetSpeed);
+        unitAttackTime              = new WaitForSeconds(AttackTime);
 
         GameEventManager.Instance.AddEvent(GameStatus.GAMEINPROGRESS, OnGameInProgress);
     }
 
     void Start()
     {
-
+        poolManager.CreateGameObjectPool(GameUnitObjectType.ENEMYBULLET, Bullet, 40);
     }
 
     void Update() 
